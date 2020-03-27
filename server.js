@@ -15,6 +15,8 @@ const auth = require('./routes/api/auth');
 // db
 const connectDB = require('./config/db');
 
+const errorHandler = require('./middleware/error');
+
 const mainThread = async () => {
 	await connectDB(); // wait for the database to beconnected
 	//
@@ -34,6 +36,9 @@ const mainThread = async () => {
 	}
 	// routing
 	app.use('/api/auth', auth);
+
+	// Custom Error Handler
+	app.use(errorHandler);
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	const PORT = process.env.SERVER_PORT || 5000;
