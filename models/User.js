@@ -1,4 +1,7 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = mongoose.Schema({
 	email: {
@@ -41,4 +44,36 @@ const UserSchema = mongoose.Schema({
 		default: Date.now
 	}
 });
+
+//
+// ─── ENCRYPT REGISTERED PASSWORD Using [bcrypt] ────────────────────────────────────────────────
+//
+UserSchema.pre('save', async function(next) {
+	//If the password isn't being modified => calling the next middleware
+	if (!this.isModified('password')) {
+		next();
+	}
+
+	// Gen salt and applied to the current password
+	const salt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, salt);
+});
+
+//
+// ─── JWT SIGNING & RETURN ────────────────────────────────────────────────────────────────
+//
+UserSchema.methods.getSignedJwtToken = function() {
+	return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+		expiresIn: process.env.JWT_EXPIRE
+	});
+};
+
+//
+// ─── MATCH USER ENTERED PASSWORD WITH THE PASSWORD THAT STORED IN DB WITH THE USE OF BCRYPT
+//
+
+UserSchema.methods.matchPassword = async function(enteredPassword) {
+	return await bcrypt.compare(enteredPassword, this.password);
+};
+
 module.exports = mongoose.model('User', UserSchema);
