@@ -12,7 +12,11 @@ dotenv.config({ path: './config/config.env' });
 // routes importing
 const auth = require('./routes/api/auth');
 
-const mainThread = () => {
+// db
+const connectDB = require('./config/db');
+
+const mainThread = async () => {
+	await connectDB(); // wait for the database to beconnected
 	//
 	// ─── PARSER ─────────────────────────────────────────────────────────────────────
 	//
