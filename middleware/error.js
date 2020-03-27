@@ -20,6 +20,17 @@ const errorHandler = (err, req, res, next) => {
 		error = new ErrorResponse(message, 400);
 	}
 
+	// Mongoose validation error
+	if (err.name === 'ValidationError') {
+		// Long ass string => old ways
+		//const message = Object.values(err.errors).map((val) => val.message);
+		//error = new ErrorResponse(errors, 400);
+		const errors = {};
+		Object.values(err.errors).forEach((val) => (errors[val.path] = val.message));
+		error.message = errors; // new assigned way
+		error.statusCode = 400;
+	}
+
 	res.status(error.statusCode || 500).json({
 		success: false,
 		errors: error.message || 'Server Error'
