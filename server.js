@@ -32,6 +32,13 @@ const mainThread = () => {
 	const server = app.listen(PORT || 5000, () => {
 		console.log(`The server is currently running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold);
 	});
+
+	// Handle unhandled promise rejections
+	process.on('unhandledRejection', (err, promise) => {
+		console.log(`Error: ${err.message}`.red);
+		// Close server & exit process
+		server.close(() => process.exit(1));
+	});
 };
 
 mainThread();
