@@ -10,6 +10,11 @@ const UserSchema = mongoose.Schema({
 		unique: true,
 		match: [ /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email' ]
 	},
+	role: {
+		// No enum becacuse only 2 role [user,admin] => set admin directly from compass or any dbms
+		type: String,
+		default: 'user'
+	},
 	username: {
 		type: String,
 		required: [ true, 'Please add a username' ]
