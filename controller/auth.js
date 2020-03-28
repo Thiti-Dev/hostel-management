@@ -59,8 +59,13 @@ exports.login = asyncHandler(async (req, res, next) => {
 	}
 
 	// Check if the user exist
-	const user = await User.findOne({ email }).select('+password');
-
+	let user; // later will be using if not found by email ( Assuming that user entered the username)
+	user = await User.findOne({ email }).select('+password');
+	if (!user) {
+		// If not found any credential by email
+		// @fetching for user by a username
+		user = await User.findOne({ username: email }).select('+password');
+	}
 	if (!user) {
 		return next(new ErrorResponse('Invalid credentials', 401));
 	}
