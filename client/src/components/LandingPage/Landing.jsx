@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { withRouter } from 'react-router-dom';
 import {
 	//Button,
 	//Jumbotron,
@@ -169,7 +169,7 @@ const ButtonInNav = styled.span`
 const bgLanding =
 	'https://images.pexels.com/photos/860562/pexels-photo-860562.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940';
 
-function Landing() {
+function Landing(props) {
 	useEffect(() => {
 		document.title = '🏠 Hosteloga';
 	}, []);
@@ -188,6 +188,9 @@ function Landing() {
 	// 		window.removeEventListener('scroll', handleScroll);
 	// 	};
 	// }, []);
+	const jumpToPage = (routeStr) => {
+		props.history.push(routeStr);
+	};
 	return (
 		<Container fluid style={{ margin: 0, padding: 0 }}>
 			{/* <TransNav>
@@ -206,7 +209,7 @@ function Landing() {
 					<ButtonInNav>About</ButtonInNav>
 					<ButtonInNav>Hostels</ButtonInNav>
 					<ButtonInNav>Sign up</ButtonInNav>
-					<ButtonInNav>Sign in</ButtonInNav>
+					<ButtonInNav onClick={() => jumpToPage('/login')}>Sign in</ButtonInNav>
 				</MenuContainer>
 			</TransNav>
 			<Parallax
@@ -253,4 +256,4 @@ function Landing() {
 	);
 }
 
-export default Landing;
+export default withRouter(Landing);
