@@ -11,6 +11,7 @@ dotenv.config({ path: './config/config.env' });
 
 // routes importing
 const auth = require('./routes/api/auth');
+const services = require('./routes/api/services');
 
 // db
 const connectDB = require('./config/db');
@@ -36,6 +37,7 @@ const mainThread = async () => {
 	}
 	// routing
 	app.use('/api/auth', auth);
+	app.use('/api/services', services);
 
 	// Custom Error Handler
 	app.use(errorHandler);
