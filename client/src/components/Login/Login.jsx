@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import {
 	//Button,
@@ -61,15 +62,27 @@ const CardForm = styled(Card)`
     padding: 2rem;
     width: 40rem;
 `;
+
+const CustomErrorFeedback = styled.p`
+	color: red;
+	font-size: 0.9rem;
+	margin-top: 1rem;
+	text-align: center;
+`;
+
 function Login() {
 	useEffect(() => {
 		document.title = '🔐 Authentication';
 	}, []);
 
+	const [ errorMsg, setErrorMsg ] = useState('');
+
 	const [ credentials, setCredential ] = useState({
 		email: '',
 		password: ''
 	});
+
+	const [ notifyInvalid, setNotifyInvalid ] = useState(false);
 
 	const formInputHandler = (event) => {
 		let key = event.target.name;
@@ -77,6 +90,22 @@ function Login() {
 		setCredential((prevState) => {
 			return { ...prevState, [key]: value };
 		});
+	};
+
+	const formSubmit = async (next) => {
+		if (credentials.email.length === 0 || credentials.password.length === 0) {
+			setNotifyInvalid(true);
+			return next(false, '⛔️ Invalid Credential');
+		}
+		try {
+			const result = await axios.post('/api/auth/login', credentials);
+			console.log(result);
+			next();
+		} catch (err) {
+			const { errors } = err.response.data; // destructuring
+			setErrorMsg(errors); // set an error message
+			return next(false, '⛔️ Invalid Credential');
+		}
 	};
 	return (
 		<Container fluid>
@@ -94,9 +123,10 @@ function Login() {
 								placeholder="Email / Username"
 								onChange={formInputHandler}
 								name="email"
-								// isInvalid={!Func.validateEmail(credentials.email) && credentials.email.length > 0}
+								isInvalid={notifyInvalid && credentials.email.length === 0}
+								autoComplete="off"
 							/>
-							<Form.Control.Feedback type="invalid">Invalid email</Form.Control.Feedback>
+							<Form.Control.Feedback type="invalid">Don't leave this empty</Form.Control.Feedback>
 							<Form.Text className="text-muted">We'll never share your email with anyone else.</Form.Text>
 						</Form.Group>
 
@@ -107,7 +137,9 @@ function Login() {
 								placeholder="Password"
 								onChange={formInputHandler}
 								name="password"
+								isInvalid={notifyInvalid && credentials.password.length === 0}
 							/>
+							<Form.Control.Feedback type="invalid">Don't leave this empty</Form.Control.Feedback>
 						</Form.Group>
 						<Form.Group controlId="formBasicCheckbox">
 							<Form.Check type="checkbox" label="Remember my credential" />
@@ -119,7 +151,7 @@ function Login() {
 							action={(element, next) =>
 								setTimeout(() => {
 									//awesome_button_middleware = next;
-									next();
+									formSubmit(next);
 								}, 500)}
 							loadingLabel="Logging In , Please be patient . . ."
 							resultLabel="👍🏽"
@@ -127,6 +159,7 @@ function Login() {
 							Sign In
 						</AwesomeButtonProgress>
 					</Form>
+					<CustomErrorFeedback>{errorMsg ? errorMsg : null}</CustomErrorFeedback>
 				</CardForm>
 			</FormContainer>
 		</Container>
