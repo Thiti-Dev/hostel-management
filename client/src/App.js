@@ -6,21 +6,27 @@ import 'hover.css/css/hover-min.css';
 import 'react-awesome-button/dist/styles.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
+// -------------- Redux -----------------
+import { Provider } from 'react-redux';
+import store from './redux/store';
+// --------------------------------------
+
 //
 // ─── IMPORTING COMPONENT ────────────────────────────────────────────────────────
 //
-
 import Landing from './components/LandingPage';
 import Login from './components/Login';
 class App extends React.Component {
 	render() {
 		return (
-			<Router>
-				<Switch>
-					<Route exact path="/" component={Landing} />
-					<Route exact path="/login" component={Login} />
-				</Switch>
-			</Router>
+			<Provider store={store}>
+				<Router>
+					<Switch>
+						<Route exact path="/" component={Landing} />
+						<Route exact path="/login" component={Login} />
+					</Switch>
+				</Router>
+			</Provider>
 		);
 	}
 }
