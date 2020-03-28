@@ -1,8 +1,10 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const app = express();
 const colors = require('colors');
+const fileupload = require('express-fileupload');
 
 const cookieParser = require('cookie-parser');
 
@@ -20,6 +22,10 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
 const mainThread = async () => {
+	// Set static folder
+	app.use(express.static(path.join(__dirname, 'public')));
+	// ────────────────────────────────────────────────────────────────────────────────
+
 	await connectDB(); // wait for the database to beconnected
 	//
 	// ─── PARSER ─────────────────────────────────────────────────────────────────────
@@ -28,6 +34,8 @@ const mainThread = async () => {
 	app.use(express.json());
 	// coolkie
 	app.use(cookieParser());
+	// File uploading
+	app.use(fileupload());
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	//
