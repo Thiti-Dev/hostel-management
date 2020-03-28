@@ -42,6 +42,10 @@ const UserSchema = mongoose.Schema({
 		enum: [ 'male', 'female' ],
 		required: [ true, 'Please select a gender' ]
 	},
+	photo: {
+		type: String,
+		default: 'unknown-user.jpg'
+	},
 	resetPasswordToken: String,
 	resetPasswordExpire: Date,
 	createdAt: {
