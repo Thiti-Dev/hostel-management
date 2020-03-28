@@ -11,13 +11,14 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 //
 
 import Landing from './components/LandingPage';
-
+import Login from './components/Login';
 class App extends React.Component {
 	render() {
 		return (
 			<Router>
 				<Switch>
 					<Route exact path="/" component={Landing} />
+					<Route exact path="/login" component={Login} />
 				</Switch>
 			</Router>
 		);
