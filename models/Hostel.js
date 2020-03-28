@@ -44,7 +44,7 @@ const HostelSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now
 	},
-	validate: {
+	validated: {
 		type: Boolean,
 		default: false
 	},
