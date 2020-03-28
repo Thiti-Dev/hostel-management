@@ -31,6 +31,13 @@ const errorHandler = (err, req, res, next) => {
 		error.statusCode = 400;
 	}
 
+	// Unexpected token (json) handler
+	// Handler for custom raw json self-inpur
+	if (err.type === 'entity.parse.failed') {
+		const message = 'Invalid data ( Unexpected token )';
+		error = new ErrorResponse(message, 400);
+	}
+
 	res.status(error.statusCode || 500).json({
 		success: false,
 		errors: error.message || 'Server Error'
