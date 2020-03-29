@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import {
 	//Button,
@@ -50,6 +51,8 @@ import OnScreenSensor from 'react-onscreensensor';
 
 import SectionSeparator from '../common/SectionSeparator';
 
+import PlaceLists from './PlaceLists';
+
 import Rating from 'react-rating';
 const mainParallax =
 	'https://images.unsplash.com/photo-1527796261673-e9d61cc1e03c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
@@ -78,83 +81,6 @@ const CustomLocationSearchInput = styled(Form.Control)`
 		box-shadow: none;
 	}
 `;
-
-const PlaceOuterContainer = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center; /* For horizontal alignment */
-	align-items: center; /* For vertical alignment */
-	@media (max-width: 1200px) {
-		display: block; /* If less than that just set to block ( no responsive design for now) */
-	}
-`;
-
-const PlaceContainer = styled(Card)`
-	position: relative;
-	margin-top: 2rem;
-	margin-bottom: 2rem;
-	height: 15rem;
-	width: 70rem; /* old 100% */
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-	overflow: hidden;
-	display: block;
-`;
-
-const PlacePhoto = styled.div`
-	width: 30%;
-	height: 100%;
-	background-image: url('https://img.budgettravel.com/_contentHero1x/japanese-temple-at-sunset_reduced.jpg?mtime=20191122141348');
-	background-size: cover;
-	background-repeat: round;
-	float: left;
-	display: inline;
-`;
-
-const PlaceInfo = styled.div`
-	height: 100%;
-	width: 45%;
-	display: inline-block;
-	padding: 1.0rem 1rem 0.5rem;
-	font-family: 'Courier New', Courier, monospace;
-	border-right: 2px solid whitesmoke;
-`;
-
-const PlaceInfo2 = styled.div`
-	position: absolute;
-	width: 25%;
-	height: 100%;
-	padding: 1.0rem 1rem 0.5rem;
-	display: inline-block;
-	font-family: 'Courier New', Courier, monospace;
-`;
-
-const PlaceName = styled.p`
-	font-size: 1.5rem;
-	font-weight: bold;
-	line-height: 30px; /* within paragraph */
-	margin-bottom: 0px; /* between paragraphs */
-`;
-
-const StatusHolder = styled.p`
-	font-size: 1rem;
-	line-height: 50px; /* within paragraph */
-	margin-bottom: 0px; /* between paragraphs */
-`;
-const InformationHolder = styled.p`
-	font-size: 1rem;
-	line-height: 25px; /* within paragraph */
-	margin-bottom: 10px; /* between paragraphs */
-`;
-
-const VerifiedBadge = styled(Badge)`
-	font-size: 0.8rem;
-`;
-
-const FetchedInformation = styled.h1`
-	font-family: 'Courier New', Courier, monospace;
-	margin-top: 3rem;
-`;
-
 export default class Home extends React.Component {
 	constructor(props) {
 		super(props);
@@ -164,11 +90,24 @@ export default class Home extends React.Component {
 		this.state = {
 			startDate: new Date(Date.now()),
 			endDate: tomorrow,
-			totalGuest: 1
+			totalGuest: 1,
+			placesData: [],
+			searchStr: ''
 		};
 	}
+
+	componentDidMount() {
+		document.title = 'Find place';
+	}
+
+	async findPlace() {
+		try {
+			const fetched_hostel = await axios.get('/api/hostels/');
+			this.setState({ placesData: fetched_hostel.data.data });
+		} catch (err) {}
+	}
 	render() {
-		let { startDate, endDate, totalGuest } = this.state;
+		let { startDate, endDate, totalGuest, searchStr } = this.state;
 		return (
 			<Container fluid style={{ margin: 0, padding: 0 }}>
 				<Parallax bgImage={mainParallax} strength={400} blur={{ min: -10, max: 15 }}>
@@ -189,6 +128,8 @@ export default class Home extends React.Component {
 											aria-describedby="inputGroupPrepend"
 											required
 											autoComplete="off"
+											value={searchStr}
+											onChange={(e) => this.setState({ searchStr: e.target.value })}
 										/>
 									</InputGroup>
 								</Form.Group>
@@ -261,73 +202,18 @@ export default class Home extends React.Component {
 									setTimeout(() => {
 										//awesome_button_middleware = next;
 										next();
+										this.findPlace();
 									}, 500)}
 								loadingLabel="Finding places for you , Please be patient . . ."
 								resultLabel="👍🏽"
 							>
-								Find place
+								{searchStr.length === 0 ? 'See all hostel' : 'Find hostel'}
 							</AwesomeButtonProgress>
 						</Form>
 					</SearchContainer>
 				</Parallax>
 				<Container>
-					<FetchedInformation>Found 1 Total place</FetchedInformation>
-					<PlaceOuterContainer>
-						<PlaceContainer>
-							<PlacePhoto />
-							<PlaceInfo>
-								<PlaceName>The Ayutthaya Hostel</PlaceName>
-								<StatusHolder>
-									status: <VerifiedBadge variant="success">verified</VerifiedBadge>
-								</StatusHolder>
-								<InformationHolder>
-									<FiMapPin /> Ayutthaya , Thailand 14120
-								</InformationHolder>
-								<InformationHolder>
-									<IoIosInformationCircleOutline /> ห้องพักขนาดใหญ่ มี 10 เตียง , มีสระว่ายน้ำ ,
-									สวนหลังบ้าน มีฟิตเนสในตัว
-								</InformationHolder>
-								<InformationHolder>
-									<TiContacts /> 093-139-8015 , <AiOutlineMail /> adm@admin.in.th
-								</InformationHolder>
-							</PlaceInfo>
-							<PlaceInfo2>
-								<InformationHolder>
-									<IoIosPeople /> : 7 people booked <br />
-									<GiMoneyStack /> : 400 baht / night <br />
-									<GiTakeMyMoney /> : Total 5000 baht
-								</InformationHolder>
-								<AwesomeButtonProgress
-									style={{ width: '100%', marginTop: '0rem' }}
-									type="secondary"
-									size="medium"
-									action={(element, next) =>
-										setTimeout(() => {
-											//awesome_button_middleware = next;
-											next();
-										}, 500)}
-									loadingLabel="Getting more information . . ."
-									resultLabel="👍🏽"
-								>
-									View more
-								</AwesomeButtonProgress>
-								<AwesomeButtonProgress
-									style={{ width: '100%', marginTop: '0.5rem' }}
-									type="primary"
-									size="medium"
-									action={(element, next) =>
-										setTimeout(() => {
-											//awesome_button_middleware = next;
-											next();
-										}, 500)}
-									loadingLabel="Booking the place . . ."
-									resultLabel="👍🏽"
-								>
-									Book now
-								</AwesomeButtonProgress>
-							</PlaceInfo2>
-						</PlaceContainer>
-					</PlaceOuterContainer>
+					<PlaceLists placeData={this.state.placesData} totalGuest={this.state.totalGuest} />
 				</Container>
 			</Container>
 		);
