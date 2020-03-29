@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import allActions from '../../redux/actions';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import {
@@ -30,6 +32,8 @@ import styled from 'styled-components';
 //
 
 import * as Func from '../../utils/Functions';
+
+import DecodedJWT from '../../utils/DecodedJWT';
 
 const MainBg =
 	'https://images.unsplash.com/photo-1483943341979-30154bdbb4d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
@@ -75,6 +79,8 @@ function Login() {
 		document.title = '🔐 Authentication';
 	}, []);
 
+	//const _dState = useSelector((state) => state.dashboard);
+	const dispatch = useDispatch();
 	const [ errorMsg, setErrorMsg ] = useState('');
 
 	const [ credentials, setCredential ] = useState({
@@ -99,7 +105,10 @@ function Login() {
 		}
 		try {
 			const result = await axios.post('/api/auth/login', credentials);
-			console.log(result);
+			const { token } = result.data;
+			const decoded = DecodedJWT(token);
+			dispatch(allActions.authActions.setCurrentUser(decoded));
+			console.log(decoded);
 			next();
 		} catch (err) {
 			const { errors } = err.response.data; // destructuring
