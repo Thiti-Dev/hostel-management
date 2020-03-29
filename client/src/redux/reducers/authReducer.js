@@ -1,14 +1,19 @@
-import { DUMMY_ACTION } from '../actions/types';
-
+import { DUMMY_ACTION, SET_CURRENT_USER } from '../actions/types';
+import isEmpty from '../../validation/is-empty';
 const initialState = {
-	test: 'This is Working Just fine',
-	profile: {}
+	isAuthenticated: false,
+	user: {}
 };
 
 export default function(state = initialState, action) {
 	switch (action.type) {
-		case DUMMY_ACTION:
-			break;
+		case SET_CURRENT_USER:
+			return {
+				...state,
+				isAuthenticated: !isEmpty(action.payload),
+				user: action.payload
+			};
+
 		default:
 			return state;
 	}
