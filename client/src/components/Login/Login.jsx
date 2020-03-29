@@ -74,13 +74,27 @@ const CustomErrorFeedback = styled.p`
 	text-align: center;
 `;
 
-function Login() {
+function Login(props) {
 	useEffect(() => {
 		document.title = '🔐 Authentication';
 	}, []);
 
-	//const _dState = useSelector((state) => state.dashboard);
+	const _authState = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
+	useEffect(
+		() => {
+			if (_authState.isAuthenticated) {
+				setTimeout(() => {
+					props.history.push('/home');
+				}, 1500);
+			}
+		},
+		[ _authState.isAuthenticated ]
+	);
+	useEffect(() => {
+		document.title = '🔐 Authentication';
+	}, []);
+
 	const [ errorMsg, setErrorMsg ] = useState('');
 
 	const [ credentials, setCredential ] = useState({
