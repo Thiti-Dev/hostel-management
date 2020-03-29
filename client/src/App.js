@@ -16,14 +16,20 @@ import store from './redux/store';
 //
 import Landing from './components/LandingPage';
 import Login from './components/Login';
+import Home from './components/Home';
+
+import PrivateRoute from './components/common/PrivateRoute';
+
 class App extends React.Component {
 	render() {
+		//const state = store.getState();
 		return (
 			<Provider store={store}>
 				<Router>
 					<Switch>
 						<Route exact path="/" component={Landing} />
 						<Route exact path="/login" component={Login} />
+						<PrivateRoute exact path="/home" component={Home} />
 					</Switch>
 				</Router>
 			</Provider>
