@@ -75,6 +75,7 @@ const CustomErrorFeedback = styled.p`
 `;
 
 function Login(props) {
+	let [ needSmooth, setNeedSmooth ] = useState(false); // for smooth transistion => waiting for awesome button to make a next() call
 	useEffect(() => {
 		document.title = '🔐 Authentication';
 	}, []);
@@ -84,16 +85,18 @@ function Login(props) {
 	useEffect(
 		() => {
 			if (_authState.isAuthenticated) {
-				setTimeout(() => {
+				console.log('need smooth : ' + needSmooth);
+				if (needSmooth) {
+					setTimeout(() => {
+						props.history.push('/home');
+					}, 1500);
+				} else {
 					props.history.push('/home');
-				}, 1500);
+				}
 			}
 		},
 		[ _authState.isAuthenticated ]
 	);
-	useEffect(() => {
-		document.title = '🔐 Authentication';
-	}, []);
 
 	const [ errorMsg, setErrorMsg ] = useState('');
 
@@ -121,6 +124,7 @@ function Login(props) {
 			const result = await axios.post('/api/auth/login', credentials);
 			const { token } = result.data;
 			const decoded = DecodedJWT(token);
+			setNeedSmooth(true); // set need smooth before dispatching an action
 			dispatch(allActions.authActions.setCurrentUser(decoded));
 			console.log(decoded);
 			next();
@@ -130,6 +134,7 @@ function Login(props) {
 			return next(false, '⛔️ Invalid Credential');
 		}
 	};
+
 	return (
 		<Container fluid>
 			<BackgroundAbs />
