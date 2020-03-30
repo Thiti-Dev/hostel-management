@@ -24,6 +24,7 @@ import Home from './components/Home';
 import PrivateRoute from './components/common/PrivateRoute';
 
 import DecodedJWT from './utils/DecodedJWT';
+import EditProfile from './components/EditProfile';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
@@ -46,7 +47,8 @@ const isStillAuthenticated = (token) => {
 };
 
 class App extends React.Component {
-	componentDidMount() {
+	componentWillMount() {
+		// Big bug fixed ( changed from did mount to will mount => need to be checking before the route is created)
 		// later will decide if this has to do everytimes that the component is rendered or just once in this cycle
 		const token = cookie.load('token');
 		isStillAuthenticated(token);
@@ -60,6 +62,7 @@ class App extends React.Component {
 						<Route exact path="/" component={Landing} />
 						<Route exact path="/login" component={Login} />
 						<PrivateRoute exact path="/home" component={Home} />
+						<PrivateRoute exact path="/profile/edit" component={EditProfile} />
 					</Switch>
 				</Router>
 			</Provider>
