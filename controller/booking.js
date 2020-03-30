@@ -12,7 +12,7 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 	// ─── DEV ────────────────────────────────────────────────────────────────────────
 	//
 	req.body.user = req.body.user || req.user.id;
-	req.body.hostel = hostelId; // append to body
+	req.body.hostel = req.body.hostel || hostelId; // append to body
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	const booked_hostel = await Booking.create(req.body);
