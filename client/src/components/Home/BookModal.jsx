@@ -34,10 +34,21 @@ import * as Func from '../../utils/Functions';
 import { Animated } from 'react-animated-css';
 import styled from 'styled-components';
 
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
+
+//
+// ─── SETTING ────────────────────────────────────────────────────────────────────
+//
+const FAKE_LOAD_TIMER = 1800; // 1.8s
+// ────────────────────────────────────────────────────────────────────────────────
+
 function BookModal(props) {
 	const _actionState = useSelector((state) => state.action);
 	const search_data = _actionState.currentAction;
-	const { _id, name, photo, validated, description, phone, address, price, capacity } = props.place_data;
+	const { _id, name, photo, validated, description, phone, address, price, capacity, owner } = props.place_data;
 	const getTotalPrice = () => {
 		let total_price =
 			search_data.totalGuest * price * Func.getTotalDayBetweenDate(search_data.startDate, search_data.endDate);
@@ -50,7 +61,6 @@ function BookModal(props) {
 			if (props.show) {
 				setFetching(true);
 				setTimeout(() => {
-					setFetching(false);
 					axios
 						.get(
 							`/api/hostels/${_id}/getCapacity?start_date=${search_data.startDate}&end_date=${search_data.endDate}&total_guest=${search_data.totalGuest}`
@@ -63,13 +73,15 @@ function BookModal(props) {
 								totalRemain: capacity - data.totalBooked, // capacity - booked = remain
 								totalBooked: data.totalBooked,
 								canProceed: data.canProceed,
-								isOverload: data.isOverload
+								isOverload: data.isOverload,
+								isAlreadyBook: data.isAlreadyBook
 							});
+							setFetching(false); //after the data is set
 						})
 						.catch((err) => {
 							console.log(err);
 						});
-				}, 3000);
+				}, FAKE_LOAD_TIMER);
 				// When the prop is shown fetch the data
 			} else {
 				setFetching(false);
@@ -77,6 +89,58 @@ function BookModal(props) {
 		},
 		[ props.show ]
 	);
+
+	const reFetching = () => {
+		axios
+			.get(
+				`/api/hostels/${_id}/getCapacity?start_date=${search_data.startDate}&end_date=${search_data.endDate}&total_guest=${search_data.totalGuest}`
+			)
+			.then((res) => {
+				const { data } = res.data;
+				console.log(data);
+				setCapacityData({
+					totalCapacity: capacity,
+					totalRemain: capacity - data.totalBooked, // capacity - booked = remain
+					totalBooked: data.totalBooked,
+					canProceed: data.canProceed,
+					isOverload: data.isOverload,
+					isAlreadyBook: data.isAlreadyBook
+				});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
+	const handleBookClicked = async () => {
+		try {
+			const _body = {
+				checkIn: search_data.startDate,
+				checkOut: search_data.endDate,
+				totalPrice: price,
+				totalGuest: search_data.totalGuest
+			};
+			const booked_result = await axios.post(`/api/hostels/${_id}/booking`, _body);
+			console.log(booked_result);
+			MySwal.fire({
+				position: 'center',
+				icon: 'success',
+				title: 'Successfully booked the hostel',
+				showConfirmButton: false,
+				timer: 2500
+			});
+
+			reFetching(); // refetching
+		} catch (error) {
+			console.log(error.response.data);
+			MySwal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: 'Something went wrong!',
+				footer: 'Might be a network connection problems'
+			});
+		}
+	};
 
 	let fetched_capacity = isFetching ? (
 		<Spinner animation="border" variant="info" />
@@ -93,16 +157,19 @@ function BookModal(props) {
 		</React.Fragment>
 	);
 
-	let rendered_button =
-		capacityData.totalRemain >= search_data.totalGuest ? (
-			<Button variant="success" onClick={props.onHide}>
-				Book the place
-			</Button>
-		) : (
-			<Button variant="warning" onClick={props.onHide} disabled>
-				Sorry, there is no space for you . . .
-			</Button>
-		);
+	let rendered_button = !capacityData.isAlreadyBook ? capacityData.canProceed ? (
+		<Button variant="success" onClick={handleBookClicked}>
+			Book the place
+		</Button>
+	) : (
+		<Button variant="warning" disabled>
+			Sorry, there is no space for you . . .
+		</Button>
+	) : (
+		<Button variant="warning" disabled>
+			Already booked
+		</Button>
+	);
 
 	return (
 		<React.Fragment>
