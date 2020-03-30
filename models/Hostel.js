@@ -21,6 +21,10 @@ const HostelSchema = new mongoose.Schema({
 		type: String,
 		required: [ true, 'Please add an address' ]
 	},
+	capacity: {
+		type: Number,
+		required: [ true, 'Capacity needed for a hostel' ]
+	},
 	photo: {
 		type: String,
 		default: 'no-photo.jpg'
