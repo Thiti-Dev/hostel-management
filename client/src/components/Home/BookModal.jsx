@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
 	//Button,
@@ -21,6 +21,8 @@ import { FaSearchLocation, FaRegCalendarAlt } from 'react-icons/fa';
 import { IoMdPeople, IoIosInformationCircleOutline, IoIosPeople, IoIosCloudyNight } from 'react-icons/io';
 import { FiMapPin } from 'react-icons/fi';
 import { GiMoneyStack, GiTakeMyMoney } from 'react-icons/gi';
+import { MdMoveToInbox } from 'react-icons/md';
+import { FiBox } from 'react-icons/fi';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
 
 import Moment from 'react-moment';
@@ -40,6 +42,46 @@ function BookModal(props) {
 			search_data.totalGuest * price * Func.getTotalDayBetweenDate(search_data.startDate, search_data.endDate);
 		return total_price;
 	};
+	const [ isFetching, setFetching ] = useState(false);
+	const [ capacityData, setCapacityData ] = useState({});
+	useEffect(
+		() => {
+			if (props.show) {
+				setFetching(true);
+				setTimeout(() => {
+					setFetching(false);
+					setCapacityData({
+						totalCapacity: 10,
+						totalRemain: 5
+					});
+				}, 3000);
+				// When the prop is shown fetch the data
+			} else {
+				setFetching(false);
+			}
+		},
+		[ props.show ]
+	);
+
+	let fetched_capacity = isFetching ? (
+		<Spinner animation="border" variant="info" />
+	) : (
+		<React.Fragment>
+			<FiBox /> Total Capacity : {capacityData.totalCapacity} <br />
+			<MdMoveToInbox /> Capacity Remain : {capacityData.totalRemain}
+		</React.Fragment>
+	);
+
+	let rendered_button =
+		capacityData.totalRemain >= search_data.totalGuest ? (
+			<Button variant="success" onClick={props.onHide}>
+				Book the place
+			</Button>
+		) : (
+			<Button variant="warning" onClick={props.onHide} disabled>
+				Sorry, there is no space for you . . .
+			</Button>
+		);
 
 	return (
 		<React.Fragment>
@@ -73,8 +115,8 @@ function BookModal(props) {
 									<GiMoneyStack /> : {price} baht per night
 								</p>
 								<br />
-								<p>Confirm booking information:</p>
 								<p>
+									Confirm booking information: <br />
 									<IoMdPeople /> {search_data.totalGuest} people
 									<br />
 									<FaRegCalendarAlt />{' '}
@@ -91,12 +133,27 @@ function BookModal(props) {
 									<br />
 									<GiTakeMyMoney /> Total price: {getTotalPrice()}
 								</p>
+								<p>
+									{' '}
+									Hostel Capacity: <br />
+									{fetched_capacity}
+								</p>
 							</Col>
 						</Row>
 					</Container>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button onClick={props.onHide}>Close</Button>
+					<Button variant="danger" onClick={props.onHide}>
+						Close
+					</Button>
+					{isFetching ? (
+						<Button variant="primary" disabled>
+							<Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+							Checking a hostel for any free space
+						</Button>
+					) : (
+						rendered_button
+					)}
 				</Modal.Footer>
 			</Modal>
 		</React.Fragment>
