@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { setCurrentSearchData } from '../../redux/actions/mainAction';
 import { withRouter } from 'react-router-dom';
 import {
 	//Button,
@@ -83,7 +85,7 @@ const CustomLocationSearchInput = styled(Form.Control)`
 		box-shadow: none;
 	}
 `;
-export default class Home extends React.Component {
+class Home extends React.Component {
 	constructor(props) {
 		super(props);
 		const today = new Date();
@@ -106,6 +108,11 @@ export default class Home extends React.Component {
 		try {
 			const fetched_hostel = await axios.get('/api/hostels/');
 			this.setState({ placesData: fetched_hostel.data.data });
+			this.props.setCurrentSearchData({
+				startDate: this.state.startDate,
+				endDate: this.state.endDate,
+				totalGuest: this.state.totalGuest
+			});
 		} catch (err) {}
 	}
 	render() {
@@ -224,3 +231,8 @@ export default class Home extends React.Component {
 		);
 	}
 }
+
+const mapStateToProps = (state) => ({
+	action: state.action
+});
+export default connect(mapStateToProps, { setCurrentSearchData })(Home);
