@@ -13,7 +13,8 @@ import {
 	Badge,
 	Button,
 	Form,
-	InputGroup
+	InputGroup,
+	Modal
 } from 'react-bootstrap';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
 //
@@ -50,6 +51,7 @@ import OnScreenSensor from 'react-onscreensensor';
 import SectionSeparator from '../common/SectionSeparator';
 
 import Rating from 'react-rating';
+import BookModal from './BookModal';
 const mainParallax =
 	'https://images.unsplash.com/photo-1527796261673-e9d61cc1e03c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
 
@@ -154,6 +156,13 @@ const FetchedInformation = styled.h1`
 	margin-top: 3rem;
 `;
 export default function PlaceLists({ placeData, totalGuest }) {
+	const [ modalData, setModalData ] = React.useState({});
+	const [ modalShow, setModalShow ] = React.useState(false);
+	const onBookProcess = (data) => {
+		//console.log(placeData); // log the place data into the console
+		setModalData(data);
+		setModalShow(true);
+	};
 	console.log(placeData);
 	let places = placeData.map((place, key) => {
 		let redered_variant = place.validated ? 'success' : 'danger';
@@ -163,69 +172,73 @@ export default function PlaceLists({ placeData, totalGuest }) {
 			</React.Fragment>
 		) : null;
 		return (
-			<PlaceOuterContainer key={key}>
-				<PlaceContainer>
-					<PlacePhoto photo_loc={`/uploads/${place.photo}`} />
-					<PlaceInfo>
-						<PlaceName>{place.name}</PlaceName>
-						<StatusHolder>
-							status:{' '}
-							<VerifiedBadge variant={redered_variant}>
-								{place.validated ? 'verified' : 'not verified'}
-							</VerifiedBadge>
-						</StatusHolder>
-						<InformationHolder>
-							<FiMapPin /> {place.address}
-						</InformationHolder>
-						<InformationHolder>
-							<IoIosInformationCircleOutline /> {place.description}
-						</InformationHolder>
-						<InformationHolder>
-							<TiContacts /> {place.phone} {rendered_email}
-						</InformationHolder>
-					</PlaceInfo>
-					<PlaceInfo2>
-						<InformationHolder>
-							<IoIosPeople /> : 7 total booked <br />
-							<GiMoneyStack /> : {place.price} baht / night <br />
-							<GiTakeMyMoney /> : Total {totalGuest * place.price} baht
-						</InformationHolder>
-						<AwesomeButtonProgress
-							style={{ width: '100%', marginTop: '0rem' }}
-							type="secondary"
-							size="medium"
-							action={(element, next) =>
-								setTimeout(() => {
-									//awesome_button_middleware = next;
-									next();
-								}, 500)}
-							loadingLabel="Getting more information . . ."
-							resultLabel="👍🏽"
-						>
-							View more
-						</AwesomeButtonProgress>
-						<AwesomeButtonProgress
-							style={{ width: '100%', marginTop: '0.5rem' }}
-							type="primary"
-							size="medium"
-							action={(element, next) =>
-								setTimeout(() => {
-									//awesome_button_middleware = next;
-									next();
-								}, 500)}
-							loadingLabel="Booking the place . . ."
-							resultLabel="👍🏽"
-						>
-							Book now
-						</AwesomeButtonProgress>
-					</PlaceInfo2>
-				</PlaceContainer>
-			</PlaceOuterContainer>
+			<React.Fragment key={key}>
+				<PlaceOuterContainer>
+					<PlaceContainer>
+						<PlacePhoto photo_loc={`/uploads/${place.photo}`} />
+						<PlaceInfo>
+							<PlaceName>{place.name}</PlaceName>
+							<StatusHolder>
+								status:{' '}
+								<VerifiedBadge variant={redered_variant}>
+									{place.validated ? 'verified' : 'not verified'}
+								</VerifiedBadge>
+							</StatusHolder>
+							<InformationHolder>
+								<FiMapPin /> {place.address}
+							</InformationHolder>
+							<InformationHolder>
+								<IoIosInformationCircleOutline /> {place.description}
+							</InformationHolder>
+							<InformationHolder>
+								<TiContacts /> {place.phone} {rendered_email}
+							</InformationHolder>
+						</PlaceInfo>
+						<PlaceInfo2>
+							<InformationHolder>
+								<IoIosPeople /> : 7 total booked <br />
+								<GiMoneyStack /> : {place.price} baht / night <br />
+								<GiTakeMyMoney /> : Total {totalGuest * place.price} baht
+							</InformationHolder>
+							<AwesomeButtonProgress
+								style={{ width: '100%', marginTop: '0rem' }}
+								type="secondary"
+								size="medium"
+								action={(element, next) =>
+									setTimeout(() => {
+										//awesome_button_middleware = next;
+										next();
+									}, 500)}
+								loadingLabel="Getting more information . . ."
+								resultLabel="👍🏽"
+							>
+								View more
+							</AwesomeButtonProgress>
+							<AwesomeButtonProgress
+								style={{ width: '100%', marginTop: '0.5rem' }}
+								type="primary"
+								size="medium"
+								action={(element, next) =>
+									setTimeout(() => {
+										//awesome_button_middleware = next;
+										next();
+										onBookProcess(place);
+									}, 500)}
+								loadingLabel="Booking the place . . ."
+								resultLabel="👍🏽"
+							>
+								Book now
+							</AwesomeButtonProgress>
+						</PlaceInfo2>
+					</PlaceContainer>
+				</PlaceOuterContainer>
+			</React.Fragment>
 		);
 	});
 	let total = places.length;
 	return (
 		<React.Fragment>
+			<BookModal place_data={modalData} show={modalShow} onHide={() => setModalShow(false)} />
 			{places.length > 0 ? <FetchedInformation>Found {total} Total Hostels</FetchedInformation> : null}
 
 			{places}
