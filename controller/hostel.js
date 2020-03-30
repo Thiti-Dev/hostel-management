@@ -34,7 +34,7 @@ exports.createHostel = asyncHandler(async (req, res, next) => {
 
 // @desc    Get the capacity free between date / also give a total booking atm
 // @route   GET /api/hostels/:hostelId/getCapacity
-// @acess   Public
+// @acess   Private
 exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
 	console.log(req.query);
 	const { start_date, end_date, total_guest } = req.query;
@@ -46,6 +46,8 @@ exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
 	if (!fetched_hostel) {
 		return next(new ErrorResponse(`Hostel with id: ${hostelId} is not exist`, 404));
 	}
+
+	let isAlreadyBook = await Booking.findOne({ hostel: hostelId, user: req.user.id });
 
 	let fetched_book = await Booking.find({
 		hostel: hostelId,
@@ -61,7 +63,8 @@ exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
 		data: {
 			totalBooked: fetched_book.length,
 			canProceed: fetched_hostel.capacity - total_guest >= 0 ? true : false,
-			isOverload: fetched_hostel.capacity - fetched_book.length > 0 && remain_capacity < 0 ? true : false
+			isOverload: fetched_hostel.capacity - fetched_book.length > 0 && remain_capacity < 0 ? true : false,
+			isAlreadyBook: isAlreadyBook ? true : false
 		}
 	});
 });

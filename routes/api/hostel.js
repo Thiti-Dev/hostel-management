@@ -10,7 +10,7 @@ const bookingRouter = require('./booking');
 router.use('/:hostelId/booking', bookingRouter);
 
 router.route('/').get(getAllHostel).post(protect, createHostel);
-router.route('/:hostelId/getCapacity').get(getCapacityBetweenDate);
+router.route('/:hostelId/getCapacity').get(protect, getCapacityBetweenDate);
 router.route('/:id/photo').put(protect, uploadHostelPhoto);
 
 module.exports = router;
