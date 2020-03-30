@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { setCurrentSearchData } from '../../redux/actions/mainAction';
+import { setCurrentSearchData } from '../../redux/actions/mainActions';
 import { withRouter } from 'react-router-dom';
 import {
 	//Button,
