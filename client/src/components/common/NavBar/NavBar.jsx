@@ -20,6 +20,7 @@ import {
 import Hostels from './Hostels';
 import Account from './Account';
 import Admin from './Admin';
+import Booking from './Booking';
 
 export class NavBar extends Component {
 	render() {
@@ -34,7 +35,7 @@ export class NavBar extends Component {
 							<Hostels />
 						</ContentGroup>
 						<ContentGroup title="My Booking" width="500" height="500">
-							<p style={{ textAlign: 'center' }}>No Booking</p>
+							<Booking />
 						</ContentGroup>
 						<ContentGroup title="Admin panel" width="420" height="100">
 							<Admin />
