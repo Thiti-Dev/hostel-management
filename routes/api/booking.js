@@ -4,6 +4,6 @@ const { protect } = require('../../middleware/auth');
 
 const { bookHostel } = require('../../controller/booking');
 
-router.route('').post(bookHostel);
+router.route('').post(protect, bookHostel);
 
 module.exports = router;
