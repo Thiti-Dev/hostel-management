@@ -35,4 +35,10 @@ function validateEmail(email) {
 	return re.test(String(email).toLowerCase());
 }
 
-export { isScrolledIntoView, visibleY, validateEmail };
+const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+
+function getTotalDayBetweenDate(firstDate, secondDate) {
+	return Math.round(Math.abs((firstDate - secondDate) / oneDay));
+}
+
+export { isScrolledIntoView, visibleY, validateEmail, getTotalDayBetweenDate };
