@@ -27,7 +27,10 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 // @route   POST /api/booking/mybooking
 // @acess   Private
 exports.getMyBooking = asyncHandler(async (req, res, next) => {
-	const fetched_booking = await Booking.find({ user: req.user.id }).sort('-createdAt'); // sort => showing the lastest first
+	const fetched_booking = await Booking.find({ user: req.user.id }).sort('-createdAt').populate({
+		path: 'hostel',
+		select: 'photo name'
+	}); // sort => showing the lastest first
 	res.status(200).json({
 		sucess: true,
 		data: fetched_booking
