@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import allActions from '../../redux/actions';
 import {
 	//Button,
 	//Jumbotron,
@@ -47,6 +48,7 @@ const FAKE_LOAD_TIMER = 1800; // 1.8s
 
 function BookModal(props) {
 	const _actionState = useSelector((state) => state.action);
+	const dispatch = useDispatch();
 	const search_data = _actionState.currentAction;
 	const { _id, name, photo, validated, description, phone, address, price, capacity, owner } = props.place_data;
 	const getTotalPrice = () => {
@@ -131,6 +133,7 @@ function BookModal(props) {
 			});
 
 			reFetching(); // refetching
+			dispatch(allActions.bookingActions.reFetchBookingHistory()); // need attention on fetching again in booking history => will be checking in nav component with on recieves prop
 		} catch (error) {
 			console.log(error.response.data);
 			MySwal.fire({

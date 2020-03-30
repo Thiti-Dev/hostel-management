@@ -1,7 +1,8 @@
-import { SET_BOOKING_HISTORY } from '../actions/types';
+import { SET_BOOKING_HISTORY, RE_FETCHING_BOOKING_HISTORY, DONE_FETCHING_BOOKING_HISTORY } from '../actions/types';
 import isEmpty from '../../validation/is-empty';
 const initialState = {
-	bookingHistory: {}
+	bookingHistory: {},
+	needFetching: false
 };
 
 export default function(state = initialState, action) {
@@ -10,6 +11,18 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				bookingHistory: action.payload
+			};
+
+		case RE_FETCHING_BOOKING_HISTORY:
+			return {
+				...state,
+				needFetching: true
+			};
+
+		case DONE_FETCHING_BOOKING_HISTORY:
+			return {
+				...state,
+				needFetching: false
 			};
 
 		default:

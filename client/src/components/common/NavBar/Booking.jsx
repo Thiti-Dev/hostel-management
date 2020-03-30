@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import Moment from 'react-moment';
+import { fetchBookingHistory } from '../../../redux/actions/bookingActions';
 import styled from 'styled-components';
 import {
 	//Button,
@@ -85,21 +88,41 @@ const dummyData = [
 	}
 ];
 
-export default class Booking extends Component {
+class Booking extends Component {
+	componentDidMount() {
+		console.log('Fetching history should be doing here');
+		this.props.fetchBookingHistory();
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.booking) {
+			if (nextProps.booking.needFetching === true) {
+				this.props.fetchBookingHistory(); // re-fetching
+			}
+		}
+	}
 	render() {
+		let { bookingHistory } = this.props.booking;
 		let rendered_history;
-		if (dummyData.length > 0) {
-			rendered_history = dummyData.map((place, key) => {
+		if (bookingHistory.length > 0) {
+			rendered_history = bookingHistory.map((place, key) => {
 				return (
 					<CustomRow className="hvr-grow">
 						<Col md={4}>
-							<Image src={`/uploads/${place.photo}`} width="120" height="80" rounded />
+							<Image src={`/uploads/${place.hostel.photo}`} width="120" height="80" rounded />
 						</Col>
 						<Col md={8}>
 							<p>
-								<FiMapPin /> {place.name}
+								<FiMapPin /> {place.hostel.name}
 								<br />
-								<FaRegCalendarAlt /> {place.startDate} - {place.endDate}
+								<FaRegCalendarAlt />{' '}
+								<Moment format="D MMM YYYY" withTitle>
+									{place.checkIn}
+								</Moment>
+								-{' '}
+								<Moment format="D MMM YYYY" withTitle>
+									{place.checkOut}
+								</Moment>
 								<br />
 								<IoMdPeople /> {place.totalGuest} people
 								<br />
@@ -115,3 +138,8 @@ export default class Booking extends Component {
 		return <BookingHolder fluid>{rendered_history}</BookingHolder>;
 	}
 }
+const mapStateToProps = (state) => ({
+	booking: state.booking
+});
+
+export default connect(mapStateToProps, { fetchBookingHistory })(Booking);
