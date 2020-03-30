@@ -2,6 +2,7 @@ const path = require('path');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Hostel = require('../models/Hostel');
+const Booking = require('../models/Booking');
 // @desc    Get all hostel
 // @route   GET /api/hostels/
 // @acess   Public
@@ -28,6 +29,40 @@ exports.createHostel = asyncHandler(async (req, res, next) => {
 	res.status(201).json({
 		success: true,
 		data: created_hostel
+	});
+});
+
+// @desc    Get the capacity free between date / also give a total booking atm
+// @route   GET /api/hostels/:hostelId/getCapacity
+// @acess   Public
+exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
+	console.log(req.query);
+	const { start_date, end_date, total_guest } = req.query;
+	const { hostelId } = req.params;
+	console.log(hostelId);
+
+	const fetched_hostel = await Hostel.findById(hostelId);
+
+	if (!fetched_hostel) {
+		return next(new ErrorResponse(`Hostel with id: ${hostelId} is not exist`, 404));
+	}
+
+	let fetched_book = await Booking.find({
+		hostel: hostelId,
+		$or: [
+			{ checkOut: { $gte: end_date }, checkIn: { $lt: end_date } },
+			{ checkIn: { $lte: start_date }, checkOut: { $gt: start_date } }
+		]
+	});
+	console.log(fetched_hostel.capacity);
+	const remain_capacity = fetched_hostel.capacity - total_guest;
+	res.status(200).json({
+		success: true,
+		data: {
+			totalBooked: fetched_book.length,
+			canProceed: fetched_hostel.capacity - total_guest >= 0 ? true : false,
+			isOverload: fetched_hostel.capacity - fetched_book.length > 0 && remain_capacity < 0 ? true : false
+		}
 	});
 });
 
