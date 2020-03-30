@@ -3,6 +3,8 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Hostel = require('../models/Hostel');
 const Booking = require('../models/Booking');
+
+var ObjectId = require('mongodb').ObjectID;
 // @desc    Get all hostel
 // @route   GET /api/hostels/
 // @acess   Public
@@ -36,10 +38,10 @@ exports.createHostel = asyncHandler(async (req, res, next) => {
 // @route   GET /api/hostels/:hostelId/getCapacity
 // @acess   Private
 exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
-	console.log(req.query);
+	//console.log(req.query);
 	const { start_date, end_date, total_guest } = req.query;
 	const { hostelId } = req.params;
-	console.log(hostelId);
+	//console.log(hostelId);
 
 	const fetched_hostel = await Hostel.findById(hostelId);
 
@@ -56,14 +58,40 @@ exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
 			{ checkIn: { $lte: start_date }, checkOut: { $gt: start_date } }
 		]
 	});
-	console.log(fetched_hostel.capacity);
-	const remain_capacity = fetched_hostel.capacity - total_guest;
+
+	const totalPeople = await Booking.aggregate([
+		// Limit to relevant documents and potentially take advantage of an index
+		{
+			$match: {
+				hostel: ObjectId(hostelId),
+				$or: [
+					{ checkOut: { $gte: new Date(end_date) }, checkIn: { $lt: new Date(end_date) } },
+					{ checkIn: { $lte: new Date(start_date) }, checkOut: { $gt: new Date(start_date) } }
+				]
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				total: { $sum: '$totalGuest' }
+			}
+		}
+	]);
+
+	let totalPeopleBooked = 0; // default
+	if (totalPeople.length > 0) {
+		totalPeopleBooked = totalPeople[0].total;
+	}
+
+	//console.log(totalPeople);
+	const remain_capacity = fetched_hostel.capacity - totalPeopleBooked;
+	const remain_capacity_include_current = remain_capacity - total_guest;
 	res.status(200).json({
 		success: true,
 		data: {
-			totalBooked: fetched_book.length,
-			canProceed: fetched_hostel.capacity - total_guest >= 0 ? true : false,
-			isOverload: fetched_hostel.capacity - fetched_book.length > 0 && remain_capacity < 0 ? true : false,
+			totalBooked: totalPeopleBooked,
+			canProceed: remain_capacity_include_current >= 0 ? true : false,
+			isOverload: remain_capacity > 0 && remain_capacity_include_current < 0 ? true : false,
 			isAlreadyBook: isAlreadyBook ? true : false
 		}
 	});
