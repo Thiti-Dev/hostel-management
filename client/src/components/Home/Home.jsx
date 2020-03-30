@@ -15,7 +15,8 @@ import {
 	Badge,
 	Button,
 	Form,
-	InputGroup
+	InputGroup,
+	Navbar
 } from 'react-bootstrap';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
 //
@@ -54,6 +55,7 @@ import SectionSeparator from '../common/SectionSeparator';
 import PlaceLists from './PlaceLists';
 
 import Rating from 'react-rating';
+import NavBar from '../common/NavBar/NavBar';
 const mainParallax =
 	'https://images.unsplash.com/photo-1527796261673-e9d61cc1e03c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
 
@@ -109,113 +111,116 @@ export default class Home extends React.Component {
 	render() {
 		let { startDate, endDate, totalGuest, searchStr } = this.state;
 		return (
-			<Container fluid style={{ margin: 0, padding: 0 }}>
-				<Parallax bgImage={mainParallax} strength={400} blur={{ min: -10, max: 15 }}>
-					<div style={{ height: '100vh' }} />
-					<SearchContainer>
-						<Form noValidate onSubmit={(e) => e.preventDefault()}>
-							<Form.Row>
-								<Form.Group as={Col} md="12" controlId="validationCustomSearch">
-									<InputGroup style={{ height: '3.5rem' }}>
-										<InputGroup.Prepend>
-											<InputGroup.Text id="inputGroupPrepend">
-												<FaSearchLocation style={{ width: '2rem' }} />
-											</InputGroup.Text>
-										</InputGroup.Prepend>
-										<CustomLocationSearchInput
-											type="text"
-											placeholder="Where do you want to have a rest in"
-											aria-describedby="inputGroupPrepend"
-											required
-											autoComplete="off"
-											value={searchStr}
-											onChange={(e) => this.setState({ searchStr: e.target.value })}
-										/>
-									</InputGroup>
-								</Form.Group>
-							</Form.Row>
-							<Form.Row>
-								<Form.Group as={Col} md="4" controlId="validationCustomCheckIn">
-									<Form.Label>Check In</Form.Label>
-									<InputGroup style={{ height: '3.5rem' }}>
-										<InputGroup.Prepend>
-											<InputGroup.Text id="inputGroupPrepend">
-												<FaRegCalendarAlt style={{ width: '2rem' }} />
-											</InputGroup.Text>
-										</InputGroup.Prepend>
-										<DatePicker
-											style={{ marginLeft: 5 }}
-											value={startDate}
-											onChange={(date) => this.setState({ startDate: date })}
-										/>
-									</InputGroup>
-								</Form.Group>
-								<Form.Group as={Col} md="4" controlId="validationCustomCheckout">
-									<Form.Label>Check Out</Form.Label>
-									<InputGroup style={{ height: '3.5rem' }}>
-										<InputGroup.Prepend>
-											<InputGroup.Text id="inputGroupPrepend">
-												<FaRegCalendarAlt style={{ width: '2rem' }} />
-											</InputGroup.Text>
-										</InputGroup.Prepend>
-										<DatePicker
-											style={{ marginLeft: 5, zIndex: '999' }}
-											value={endDate}
-											onChange={(date) => this.setState({ endDate: date })}
-										/>
-									</InputGroup>
-								</Form.Group>
-								<Form.Group as={Col} md="4" controlId="validationCustomCheckout">
-									<Form.Label>Guests</Form.Label>
-									<InputGroup style={{ height: '3.5rem' }}>
-										<InputGroup.Prepend>
-											<InputGroup.Text id="inputGroupPrepend">
-												<IoMdPeople style={{ width: '2rem' }} />
-											</InputGroup.Text>
-										</InputGroup.Prepend>
-										<Form.Control
-											as="select"
-											size="lg"
-											custom
-											style={{ height: ' 3.5rem' }}
-											onChange={(e) => this.setState({ totalGuest: e.target.value })}
-											value={totalGuest}
-										>
-											<option value={1}>1 Guest</option>
-											<option value={2}>2 Guests</option>
-											<option value={3}>3 Guests</option>
-											<option value={4}>4 Guests</option>
-											<option value={5}>5 Guests</option>
-											<option value={6}>6 Guests</option>
-											<option value={7}>7 Guests</option>
-											<option value={8}>8 Guests</option>
-											<option value={9}>9 Guests</option>
-										</Form.Control>
-									</InputGroup>
-								</Form.Group>
-							</Form.Row>
-							<AwesomeButtonProgress
-								style={{ width: '100%', marginTop: '1rem', zIndex: '1' }}
-								type="secondary"
-								size="medium"
-								action={(element, next) =>
-									setTimeout(() => {
-										//awesome_button_middleware = next;
-										next();
-										this.findPlace();
-									}, 500)}
-								loadingLabel="Finding places for you , Please be patient . . ."
-								resultLabel="👍🏽"
-							>
-								{searchStr.length === 0 ? 'See all hostel' : 'Find hostel'}
-							</AwesomeButtonProgress>
-						</Form>
-					</SearchContainer>
-				</Parallax>
-				<Container>
-					<PlaceLists placeData={this.state.placesData} totalGuest={this.state.totalGuest} />
+			<React.Fragment>
+				<NavBar />
+				<Container fluid style={{ margin: 0, padding: 0 }}>
+					<Parallax bgImage={mainParallax} strength={400} blur={{ min: -10, max: 15 }}>
+						<div style={{ height: '100vh' }} />
+						<SearchContainer>
+							<Form noValidate onSubmit={(e) => e.preventDefault()}>
+								<Form.Row>
+									<Form.Group as={Col} md="12" controlId="validationCustomSearch">
+										<InputGroup style={{ height: '3.5rem' }}>
+											<InputGroup.Prepend>
+												<InputGroup.Text id="inputGroupPrepend">
+													<FaSearchLocation style={{ width: '2rem' }} />
+												</InputGroup.Text>
+											</InputGroup.Prepend>
+											<CustomLocationSearchInput
+												type="text"
+												placeholder="Where do you want to have a rest in"
+												aria-describedby="inputGroupPrepend"
+												required
+												autoComplete="off"
+												value={searchStr}
+												onChange={(e) => this.setState({ searchStr: e.target.value })}
+											/>
+										</InputGroup>
+									</Form.Group>
+								</Form.Row>
+								<Form.Row>
+									<Form.Group as={Col} md="4" controlId="validationCustomCheckIn">
+										<Form.Label>Check In</Form.Label>
+										<InputGroup style={{ height: '3.5rem' }}>
+											<InputGroup.Prepend>
+												<InputGroup.Text id="inputGroupPrepend">
+													<FaRegCalendarAlt style={{ width: '2rem' }} />
+												</InputGroup.Text>
+											</InputGroup.Prepend>
+											<DatePicker
+												style={{ marginLeft: 5 }}
+												value={startDate}
+												onChange={(date) => this.setState({ startDate: date })}
+											/>
+										</InputGroup>
+									</Form.Group>
+									<Form.Group as={Col} md="4" controlId="validationCustomCheckout">
+										<Form.Label>Check Out</Form.Label>
+										<InputGroup style={{ height: '3.5rem' }}>
+											<InputGroup.Prepend>
+												<InputGroup.Text id="inputGroupPrepend">
+													<FaRegCalendarAlt style={{ width: '2rem' }} />
+												</InputGroup.Text>
+											</InputGroup.Prepend>
+											<DatePicker
+												style={{ marginLeft: 5, zIndex: '999' }}
+												value={endDate}
+												onChange={(date) => this.setState({ endDate: date })}
+											/>
+										</InputGroup>
+									</Form.Group>
+									<Form.Group as={Col} md="4" controlId="validationCustomCheckout">
+										<Form.Label>Guests</Form.Label>
+										<InputGroup style={{ height: '3.5rem' }}>
+											<InputGroup.Prepend>
+												<InputGroup.Text id="inputGroupPrepend">
+													<IoMdPeople style={{ width: '2rem' }} />
+												</InputGroup.Text>
+											</InputGroup.Prepend>
+											<Form.Control
+												as="select"
+												size="lg"
+												custom
+												style={{ height: ' 3.5rem' }}
+												onChange={(e) => this.setState({ totalGuest: e.target.value })}
+												value={totalGuest}
+											>
+												<option value={1}>1 Guest</option>
+												<option value={2}>2 Guests</option>
+												<option value={3}>3 Guests</option>
+												<option value={4}>4 Guests</option>
+												<option value={5}>5 Guests</option>
+												<option value={6}>6 Guests</option>
+												<option value={7}>7 Guests</option>
+												<option value={8}>8 Guests</option>
+												<option value={9}>9 Guests</option>
+											</Form.Control>
+										</InputGroup>
+									</Form.Group>
+								</Form.Row>
+								<AwesomeButtonProgress
+									style={{ width: '100%', marginTop: '1rem', zIndex: '1' }}
+									type="secondary"
+									size="medium"
+									action={(element, next) =>
+										setTimeout(() => {
+											//awesome_button_middleware = next;
+											next();
+											this.findPlace();
+										}, 500)}
+									loadingLabel="Finding places for you , Please be patient . . ."
+									resultLabel="👍🏽"
+								>
+									{searchStr.length === 0 ? 'See all hostel' : 'Find hostel'}
+								</AwesomeButtonProgress>
+							</Form>
+						</SearchContainer>
+					</Parallax>
+					<Container>
+						<PlaceLists placeData={this.state.placesData} totalGuest={this.state.totalGuest} />
+					</Container>
 				</Container>
-			</Container>
+			</React.Fragment>
 		);
 	}
 }
