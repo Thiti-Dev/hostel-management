@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import {
 	//Button,
@@ -36,7 +37,7 @@ import styled from 'styled-components';
 function BookModal(props) {
 	const _actionState = useSelector((state) => state.action);
 	const search_data = _actionState.currentAction;
-	const { _id, name, photo, validated, description, phone, address, price } = props.place_data;
+	const { _id, name, photo, validated, description, phone, address, price, capacity } = props.place_data;
 	const getTotalPrice = () => {
 		let total_price =
 			search_data.totalGuest * price * Func.getTotalDayBetweenDate(search_data.startDate, search_data.endDate);
@@ -50,10 +51,24 @@ function BookModal(props) {
 				setFetching(true);
 				setTimeout(() => {
 					setFetching(false);
-					setCapacityData({
-						totalCapacity: 10,
-						totalRemain: 5
-					});
+					axios
+						.get(
+							`/api/hostels/${_id}/getCapacity?start_date=${search_data.startDate}&end_date=${search_data.endDate}&total_guest=${search_data.totalGuest}`
+						)
+						.then((res) => {
+							const { data } = res.data;
+							console.log(data);
+							setCapacityData({
+								totalCapacity: capacity,
+								totalRemain: capacity - data.totalBooked, // capacity - booked = remain
+								totalBooked: data.totalBooked,
+								canProceed: data.canProceed,
+								isOverload: data.isOverload
+							});
+						})
+						.catch((err) => {
+							console.log(err);
+						});
 				}, 3000);
 				// When the prop is shown fetch the data
 			} else {
@@ -67,7 +82,13 @@ function BookModal(props) {
 		<Spinner animation="border" variant="info" />
 	) : (
 		<React.Fragment>
-			<FiBox /> Total Capacity : {capacityData.totalCapacity} <br />
+			<IoIosPeople />{' '}
+			{capacityData.totalBooked === 0 ? (
+				`No one booked in this period of time`
+			) : (
+				`${capacityData.totalBooked} Total people booked at this period of time`
+			)}{' '}
+			<br />
 			<MdMoveToInbox /> Capacity Remain : {capacityData.totalRemain}
 		</React.Fragment>
 	);
@@ -107,6 +128,12 @@ function BookModal(props) {
 						<Row className="show-grid">
 							<Col md={4}>
 								<img src={`/uploads/${photo}`} width="100%" height="220" />
+
+								<p style={{ textAlign: 'center' }}>
+									<br />
+									<br />
+									<FiBox /> Total Capacity : {capacity} <br />
+								</p>
 							</Col>
 							<Col md={8}>
 								<p>
