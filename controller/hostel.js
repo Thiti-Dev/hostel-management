@@ -1,11 +1,11 @@
 const path = require('path');
 const ErrorResponse = require('../utils/errorResponse');
-
+const asyncHandler = require('../middleware/async');
 const Hostel = require('../models/Hostel');
 // @desc    Get all hostel
 // @route   GET /api/hostels/
 // @acess   Public
-exports.getAllHostel = async (req, res, next) => {
+exports.getAllHostel = asyncHandler(async (req, res, next) => {
 	const hostels = await Hostel.find().populate({
 		path: 'owner',
 		select: 'username'
@@ -14,12 +14,12 @@ exports.getAllHostel = async (req, res, next) => {
 		success: true,
 		data: hostels
 	});
-};
+});
 
 // @desc    Create sigle hostel
 // @route   POST /api/hostels/
 // @acess   Private
-exports.createHostel = async (req, res, next) => {
+exports.createHostel = asyncHandler(async (req, res, next) => {
 	// Add user to req.body before crating with the raw body
 	req.body.user = req.user.id;
 
@@ -29,12 +29,12 @@ exports.createHostel = async (req, res, next) => {
 		success: true,
 		data: created_hostel
 	});
-};
+});
 
 // @desc    Update hostel photo
 // @route   PUT /api/hostels/:id/photo
 // @acess   Private
-exports.uploadHostelPhoto = async (req, res, next) => {
+exports.uploadHostelPhoto = asyncHandler(async (req, res, next) => {
 	const hostel = await Hostel.findById(req.params.id); // findByIdAndDelete not gonna triggered the middle ware
 
 	if (!hostel) {
@@ -78,4 +78,4 @@ exports.uploadHostelPhoto = async (req, res, next) => {
 
 		res.status(200).json({ success: true, data: file.name });
 	});
-};
+});
