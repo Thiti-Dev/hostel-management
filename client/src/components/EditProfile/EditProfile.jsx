@@ -78,6 +78,13 @@ const CustomCancleButton = styled(AwesomeButton)`
 	width: 100%;
 `;
 
+const CustomUserImage = styled(Image)`
+	cursor: pointer;
+	&:hover{
+		content: url('https://icons.iconarchive.com/icons/pelfusion/flat-folder/512/Upload-Folder-icon.png')
+	}
+`;
+
 export default class EditProfile extends Component {
 	constructor(props) {
 		super(props);
@@ -355,17 +362,65 @@ export default class EditProfile extends Component {
 		}, 800);
 	}
 
+	async onChangeImage() {
+		const { value: file } = await Swal.fire({
+			title: 'Select image',
+			input: 'file',
+			inputAttributes: {
+				accept: 'image/*',
+				'aria-label': 'Upload your profile picture'
+			}
+		});
+
+		if (file) {
+			console.log(file);
+			let formData = new FormData();
+			formData.append('file', file);
+			try {
+				const upload_request = await axios.put('/api/auth/uploadPhoto', formData);
+				const stored_name = upload_request.data.data;
+				this.setState((prevState) => ({
+					credentials: {
+						...prevState.cachedCredential,
+						photo: stored_name
+					}
+				}));
+				MySwal.fire({
+					position: 'center',
+					icon: 'success',
+					title: 'Your photo successfully updated',
+					showConfirmButton: false,
+					timer: 1500,
+					timerProgressBar: true,
+					backdrop: true
+				});
+			} catch (error) {
+				let error_msg = error.response.data.errors || 'Somethings went wrong , try again later . . .';
+				MySwal.fire({
+					position: 'center',
+					icon: 'error',
+					title: error_msg,
+					showConfirmButton: false,
+					timer: 1500,
+					timerProgressBar: true,
+					backdrop: true
+				});
+			}
+		}
+	}
+
 	render() {
 		const { currentAction, cachedCredential, credentials, makeAnyChanges, passwordCredential } = this.state;
 		return (
 			<MainContainer>
 				<Row style={{ textAlign: 'center' }}>
 					<Col md={12}>
-						<Image
-							src="https://dailyreview.com.au/wp-content/uploads/2018/03/CALLER-1.jpg"
+						<CustomUserImage
+							src={`/uploads/${credentials.photo}`}
 							width="150"
 							height="150"
 							roundedCircle
+							onClick={() => this.onChangeImage()}
 						/>
 						<UserNameText>aaw0kenn</UserNameText>
 					</Col>
