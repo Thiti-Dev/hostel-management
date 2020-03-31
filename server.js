@@ -16,6 +16,7 @@ const auth = require('./routes/api/auth');
 const services = require('./routes/api/services');
 const hostel = require('./routes/api/hostel');
 const booking = require('./routes/api/booking');
+const users = require('./routes/api/users');
 
 // db
 const connectDB = require('./config/db');
@@ -50,6 +51,7 @@ const mainThread = async () => {
 	app.use('/api/services', services);
 	app.use('/api/hostels', hostel);
 	app.use('/api/booking', booking);
+	app.use('/api/users', users);
 
 	// Custom Error Handler
 	app.use(errorHandler);
