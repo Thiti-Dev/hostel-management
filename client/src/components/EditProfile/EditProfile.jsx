@@ -127,14 +127,22 @@ export default class EditProfile extends Component {
 		});
 	}
 
-	componentDidMount() {
-		let dummy_cred = {
+	async componentDidMount() {
+		try {
+			const credential_request = await axios.get('/api/auth/mycredentials');
+			let _credentials = credential_request.data.data;
+			_credentials.dateOfBirth = new Date(_credentials.dateOfBirth); // fixing the date-picker error
+			this.setState({ cachedCredential: _credentials, credentials: _credentials });
+		} catch (error) {
+			// Reload the page when an error occurs [ BAD PRACTICE => later will redirect to new component which  show the error status and a button to back to home page]
+			window.location.reload(false);
+		}
+		/*let dummy_cred = {
 			firstName: 'Thiti',
 			lastName: 'Mahawannakit',
 			email: 'dev@admin.in.th',
 			dateOfBirth: new Date(Date.now())
-		};
-		this.setState({ cachedCredential: dummy_cred, credentials: dummy_cred });
+		};*/
 	}
 
 	onNavClicked(action) {
@@ -316,6 +324,37 @@ export default class EditProfile extends Component {
 		return false;
 	}
 
+	async onUpdateDetails(next) {
+		try {
+			const update_request = await axios.put('/api/auth/updatedetails', this.state.credentials);
+			next();
+			this.setState({ cachedCredential: this.state.credentials });
+			this.goToProfileSection_response('profile');
+		} catch (error) {}
+	}
+
+	goToProfileSection_response(msg) {
+		//Some dynamic msg => will be using this as reference for all the of messing up above [if have time xD]
+		setTimeout(() => {
+			MySwal.fire({
+				position: 'top',
+				icon: 'success',
+				title: `Your ${msg} successfully updated`,
+				showConfirmButton: false,
+				timer: 1500,
+				timerProgressBar: true,
+				backdrop: false
+			});
+			this.setState({ currentAction: 'profile' });
+			// Set make any change to false => reset the clone of credential to be equal to the fetched old one ( current in db )
+			this.setState({
+				makeAnyChanges: false,
+				credentials: this.state.cachedCredential,
+				passwordCredential: this.clearPasswordCredential() // clear the password credential
+			});
+		}, 800);
+	}
+
 	render() {
 		const { currentAction, cachedCredential, credentials, makeAnyChanges, passwordCredential } = this.state;
 		return (
@@ -449,7 +488,7 @@ export default class EditProfile extends Component {
 															size="medium"
 															action={(element, next) =>
 																setTimeout(() => {
-																	next();
+																	this.onUpdateDetails(next);
 																}, 500)}
 															loadingLabel="Applying your changes , Please be patient . . ."
 															resultLabel="👍🏽"
