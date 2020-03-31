@@ -161,7 +161,7 @@ exports.uploadUserPhoto = asyncHandler(async (req, res, next) => {
 
 	// Check filesize
 	if (file.size > process.env.MAX_FILE_UPLOAD) {
-		return next(new ErrorResponse(`Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`, 400));
+		return next(new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400));
 	}
 
 	// Create custom filename
