@@ -168,7 +168,7 @@ export default function PlaceLists({ placeData, totalGuest }) {
 		let redered_variant = place.validated ? 'success' : 'danger';
 		let rendered_email = place.email ? (
 			<React.Fragment>
-				, <AiOutlineMail /> dev@admin.com
+				, <AiOutlineMail /> {place.email}
 			</React.Fragment>
 		) : null;
 		return (
