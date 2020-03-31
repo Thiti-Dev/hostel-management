@@ -116,10 +116,11 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/auth/updatedetails
 // @acess   Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
-	// specific the field => protected from eding password & username
+	// specific the field => protected from eding password & username & gender
 	// If more field to prevent => later will be store the blacklist in the array and then map
 	if (req.body.password) delete req.body['password'];
 	if (req.body.username) delete req.body['username'];
+	if (req.body.username) delete req.body['gender'];
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	console.log(req.body);
