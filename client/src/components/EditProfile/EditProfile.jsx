@@ -380,7 +380,7 @@ export default class EditProfile extends Component {
 				const upload_request = await axios.put('/api/auth/uploadPhoto', formData);
 				const stored_name = upload_request.data.data;
 				this.setState((prevState) => ({
-					credentials: {
+					cachedCredential: {
 						...prevState.cachedCredential,
 						photo: stored_name
 					}
@@ -416,7 +416,7 @@ export default class EditProfile extends Component {
 				<Row style={{ textAlign: 'center' }}>
 					<Col md={12}>
 						<CustomUserImage
-							src={`/uploads/${credentials.photo}`}
+							src={`/uploads/${cachedCredential.photo}`}
 							width="150"
 							height="150"
 							roundedCircle
