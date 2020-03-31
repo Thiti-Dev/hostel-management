@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import {
 	//Button,
 	//Jumbotron,
@@ -101,6 +102,29 @@ export default class EditProfile extends Component {
 			newPassword: '',
 			newPassword2: ''
 		};
+	}
+
+	discardChanges() {
+		//console.log('trying to discard all the changes');
+		Swal.fire({
+			title: 'Discard changes?',
+			text: 'Are you sure that you want to discard your changes!',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes'
+		}).then((result) => {
+			if (result.value) {
+				this.setState({ currentAction: 'profile' });
+				// Set make any change to false => reset the clone of credential to be equal to the fetched old one ( current in db )
+				this.setState({
+					makeAnyChanges: false,
+					credentials: this.state.cachedCredential,
+					passwordCredential: this.clearPasswordCredential() // clear the password credential
+				});
+			}
+		});
 	}
 
 	componentDidMount() {
@@ -237,9 +261,46 @@ export default class EditProfile extends Component {
 		}));
 	}
 
-	onChangePassword(next) {
-		console.log('Fetching put from request');
-		next();
+	async onChangePassword(next) {
+		//console.log('Fetching put from request');
+
+		try {
+			const request = await axios.put('/api/auth/updatepassword', this.state.passwordCredential);
+			next();
+			setTimeout(() => {
+				MySwal.fire({
+					position: 'top',
+					icon: 'success',
+					title: 'Your password successfully updated',
+					showConfirmButton: false,
+					timer: 1500,
+					timerProgressBar: true,
+					backdrop: false
+				});
+				this.setState({ currentAction: 'profile' });
+				// Set make any change to false => reset the clone of credential to be equal to the fetched old one ( current in db )
+				this.setState({
+					makeAnyChanges: false,
+					credentials: this.state.cachedCredential,
+					passwordCredential: this.clearPasswordCredential() // clear the password credential
+				});
+			}, 800);
+		} catch (error) {
+			//console.log(error.response);
+			let error_msg = error.response.data.errors || 'Server Error , Try later sometime';
+			next(false, 'Somethings went wrong . . .');
+			setTimeout(() => {
+				MySwal.fire({
+					position: 'top',
+					icon: 'error',
+					title: error_msg,
+					showConfirmButton: false,
+					timer: 1500,
+					timerProgressBar: true,
+					backdrop: false
+				});
+			}, 600);
+		}
 	}
 
 	passwordChangeShouldProceed() {
@@ -250,10 +311,8 @@ export default class EditProfile extends Component {
 			this.state.passwordCredential.newPassword.length > 0 &&
 			this.state.passwordCredential.newPassword2 === this.state.passwordCredential.newPassword
 		) {
-			console.log('match');
 			return true;
 		}
-		console.log('not match');
 		return false;
 	}
 
@@ -479,7 +538,11 @@ export default class EditProfile extends Component {
 												</CustomRow>
 												<CustomRow>
 													<Col md={12}>
-														<CustomCancleButton type="reddit" size="medium">
+														<CustomCancleButton
+															type="reddit"
+															size="medium"
+															action={() => this.discardChanges()}
+														>
 															Discard change
 														</CustomCancleButton>
 													</Col>
