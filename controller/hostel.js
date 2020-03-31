@@ -23,14 +23,65 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 // @route   POST /api/hostels/
 // @acess   Private
 exports.createHostel = asyncHandler(async (req, res, next) => {
-	// Add user to req.body before crating with the raw body
-	req.body.user = req.user.id;
+	//
+	// ─── CODE BELOW WILL USING UUID AND GENERATE V4 BY SHORTEN THEM BEFORE THE USE (LATER)──
+	//
 
+	// Add user to req.body before crating with the raw body
+	req.body.owner = req.user.id;
+	req.body.price = parseInt(req.body.price);
+	req.body.capacity = parseInt(req.body.capacity);
+	//
+	// ─── CHECK FOR FILE UPLOAD FIRST ─────────────────────────────────────────────────────────
+	//
+
+	if (!req.files) {
+		return next(new ErrorResponse(`Please upload a file`, 400));
+	}
+
+	const file = req.files.file;
+
+	// Make sure the image is a photo
+	if (!file.mimetype.startsWith('image')) {
+		return next(new ErrorResponse(`Please upload an image file`, 400));
+	}
+
+	// Check filesize
+	if (file.size > process.env.MAX_FILE_UPLOAD) {
+		return next(new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400));
+	}
+
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	// Create here because => the _id is needed for creating a unique file name
 	const created_hostel = await Hostel.create(req.body);
 
-	res.status(201).json({
-		success: true,
-		data: created_hostel
+	// Create custom filename
+	file.name = `photo_${created_hostel._id}${path.parse(file.name).ext}`;
+	req.body.photo = file.name;
+	file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+		if (err) {
+			//
+			// ─── IF THERE IS A PROBLEM ───────────────────────────────────────
+			//
+			// THERE WILL BE BIG TROUBLE BECAUSE THE HOSTEL IS CREATED
+			// FIX
+			// 1.RETURN SUCCESS STATUS BUT NO IMAGE FOR THAT HOSTEL => WHICH MEANS USER MAY ALLOW TO CHANGE IT LATER
+			// 2. REMOVE THE CREATED HOSTEL ONE THAT JUST HAS PUBLISHED AND RETURN ERROR CODE WHICH IS A BAD IDEA (CURRENTLY USING THIS )
+			// 3. USE UUID TO GENERATE THE FILE NAME INSTEAD ( Later will be using this )
+			await created_hostel.remove(); // not a good practice ( but I've got time limitation )
+			console.log(err);
+			return next(new ErrorResponse(`Problem with file upload`, 500));
+		}
+
+		// Re-assgin the name to photo
+		created_hostel.photo = file.name;
+		await created_hostel.save();
+
+		res.status(201).json({
+			success: true,
+			data: created_hostel
+		});
 	});
 });
 
