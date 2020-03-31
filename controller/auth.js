@@ -99,3 +99,26 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 	await user.save(); // mongoose middleware should be calling to bcrypt the password
 	sendTokenResponse(user, 200, res);
 });
+
+// @desc    Update user details
+// @route   PUT /api/auth/updatedetails
+// @acess   Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+	// specific the field => protected from eding password & username
+	// If more field to prevent => later will be store the blacklist in the array and then map
+	if (req.body.password) delete req.body['password'];
+	if (req.body.username) delete req.body['username'];
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	console.log(req.body);
+
+	const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+		new: true, // returning the document after update applied
+		runValidators: true // run validator
+	});
+
+	res.status(200).json({
+		success: true,
+		data: user
+	});
+});
