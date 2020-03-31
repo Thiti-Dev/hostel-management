@@ -244,7 +244,7 @@ export default function CreatePanel({ history }) {
 					</Form.Label>
 				</Form.Group>
 
-				<Form.Group as={Row} controlId="formHorizontalHostelName">
+				<Form.Group as={Row} controlId="formHorizontalHostelPhone">
 					<Form.Label column md={3}>
 						Phone Call
 					</Form.Label>
@@ -259,7 +259,7 @@ export default function CreatePanel({ history }) {
 						/>
 					</Col>
 				</Form.Group>
-				<Form.Group as={Row} controlId="formHorizontalHostelName">
+				<Form.Group as={Row} controlId="formHorizontalHostelEmail">
 					<Form.Label column md={3}>
 						Email Address
 					</Form.Label>
