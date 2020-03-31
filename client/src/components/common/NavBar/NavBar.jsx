@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SiteNav, { ContentGroup } from 'react-site-nav';
+import { withRouter } from 'react-router-dom';
 import {
 	//Button,
 	//Jumbotron,
@@ -23,13 +24,19 @@ import Admin from './Admin';
 import Booking from './Booking';
 
 export class NavBar extends Component {
+	constructor(props) {
+		super(props);
+	}
+	goToRoute() {
+		this.props.history.push('/profile/edit');
+	}
 	render() {
 		return (
 			<React.Fragment>
 				<div style={{ position: 'absolute', zIndex: '9999' }}>
 					<SiteNav background="transparent" fontSize="18" fontFamily="Courier New" fontSize="18" align="left">
 						<ContentGroup title="Account" width="260" height="200">
-							<Account />
+							<Account gotoroute={this.goToRoute.bind(this)} />
 						</ContentGroup>
 						<ContentGroup title="Partner" width="420" height="270">
 							<Hostels />
@@ -47,4 +54,4 @@ export class NavBar extends Component {
 	}
 }
 
-export default NavBar;
+export default withRouter(NavBar);

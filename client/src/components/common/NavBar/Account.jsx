@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import user from './assets/user.png';
 import edit_account from './assets/edit-account.png';
 import logout from './assets/logout.png';
+import { Link } from 'react-router-dom';
 const List = styled.ul`
 	display: flex;
 	flex-direction: column;
@@ -14,6 +15,7 @@ const ListItem = styled.li`
 	flex-direction: row;
 	margin-top: 20px;
 	align-items: center;
+	cursor: pointer;
 `;
 const Heading = styled.div`
 	margin: 0;
@@ -33,14 +35,14 @@ const StyledLink = styled.a`
 	}
 `;
 
-export default () => {
+export default ({ gotoroute }) => {
 	return (
 		<List>
 			<ListItem>
 				<img src={user} width={24} height={24} />
 				<Heading>aaw0kenn</Heading>
 			</ListItem>
-			<ListItem>
+			<ListItem onClick={() => gotoroute('/profile/edit')}>
 				<img src={edit_account} width={24} height={24} />
 				<Heading>Edit account</Heading>
 			</ListItem>
