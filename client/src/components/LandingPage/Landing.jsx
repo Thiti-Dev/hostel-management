@@ -290,7 +290,7 @@ function Landing(props) {
 			</CustomSection>
 			<SectionSeparator />
 
-			<Register />
+			<Register history={props.history} />
 		</Container>
 	);
 }

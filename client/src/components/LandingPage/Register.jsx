@@ -34,6 +34,10 @@ import { Link, Element, Events, animateScroll as scroll, scrollSpy, scroller } f
 
 import { Parallax, Background } from 'react-parallax';
 import DatePicker from 'react-date-picker';
+
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
 // ────────────────────────────────────────────────────────────────────────────────
 
 //
@@ -47,7 +51,7 @@ import * as Func from '../../utils/Functions';
 // ─── VALIDATOR ──────────────────────────────────────────────────────────────────
 //
 import _isRegistrationValid from './validation/register';
-
+const MySwal = withReactContent(Swal);
 const MainContainer = styled(Container)`
 	padding: 5vw;
 	font-family: 'Courier New', Courier, monospace;
@@ -90,7 +94,7 @@ const sleep = (m) => new Promise((r) => setTimeout(r, m));
 const blackListValidation = { username: [], email: [] }; // Initialize the empty array for the blacklist data to be filled
 const cached_error_msg = {};
 // ────────────────────────────────────────────────────────────────────────────────
-function Register() {
+function Register({ history }) {
 	const myForm = useRef(); // Referencing to our form
 	const [ validated, setValidated ] = useState(false); // always validate by deafult ==> for now false
 	const [ errors, setError ] = useState({}); // empty error at first
@@ -116,6 +120,20 @@ function Register() {
 			console.log(res);
 			next(); // Thumbing up
 			setDoneRegis(true); // Successfully regis , hide the form and then show the alert text with the smooth transistion
+
+			MySwal.fire({
+				position: 'center',
+				icon: 'success',
+				title: 'Your account successfully created',
+				text: 'Automatically login in 3 seconds',
+				showConfirmButton: false,
+				timer: 3000,
+				timerProgressBar: true
+			});
+
+			setTimeout(() => {
+				history.push('/home');
+			}, 3000);
 		} catch (error) {
 			// destructuring
 			let _errors = error.response.data.errors;
