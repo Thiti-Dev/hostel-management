@@ -56,14 +56,14 @@ const UserNavColumn2 = styled.div`
 const CustomNameLabel = styled.p`
 	font-size: 1.8rem;
 	font-weight: bolder;
-	white-space: nowrap;
+	/* white-space: nowrap; */
 	margin-top: 2rem;
 `;
 
 const CustomUserNameLabel = styled.p`
 	font-size: 1.8rem;
 	font-weight: 100;
-	white-space: nowrap;
+	/* white-space: nowrap; */
 `;
 
 const CustomNavList = styled.li`
