@@ -41,4 +41,18 @@ function getTotalDayBetweenDate(firstDate, secondDate) {
 	return Math.round(Math.abs((firstDate - secondDate) / oneDay));
 }
 
-export { isScrolledIntoView, visibleY, validateEmail, getTotalDayBetweenDate };
+const text_truncate = function(str, length, ending) {
+	if (length == null) {
+		length = 100;
+	}
+	if (ending == null) {
+		ending = '...';
+	}
+	if (str.length > length) {
+		return str.substring(0, length - ending.length) + ending;
+	} else {
+		return str;
+	}
+};
+
+export { isScrolledIntoView, visibleY, validateEmail, getTotalDayBetweenDate, text_truncate };

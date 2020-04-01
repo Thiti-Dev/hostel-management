@@ -50,6 +50,8 @@ import OnScreenSensor from 'react-onscreensensor';
 
 import SectionSeparator from '../common/SectionSeparator';
 
+import * as Func from '../../utils/Functions';
+
 import Rating from 'react-rating';
 import BookModal from './BookModal';
 const mainParallax =
@@ -95,6 +97,7 @@ const PlaceContainer = styled(Card)`
 	margin-top: 2rem;
 	margin-bottom: 2rem;
 	height: 15rem;
+	/* max-height: 20rem; */
 	width: 70rem; /* old 100% */
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 	overflow: hidden;
@@ -113,11 +116,32 @@ const PlacePhoto = styled.div`
 
 const PlaceInfo = styled.div`
 	height: 100%;
+	overflow-y: auto;
 	width: 45%;
 	display: inline-block;
 	padding: 1.0rem 1rem 0.5rem;
 	font-family: 'Courier New', Courier, monospace;
 	border-right: 2px solid whitesmoke;
+
+	&::-webkit-scrollbar {
+		width: 0.3vw;
+		padding-left: 5vw;
+	}
+	&::-webkit-scrollbar-track {
+		background: #f1f1f100;
+		border-radius: 10px;
+	}
+
+	/* Handle */
+	&::-webkit-scrollbar-thumb {
+		background: grey;
+		border-radius: 10px;
+	}
+
+	/* Handle on hover */
+	&::-webkit-scrollbar-thumb:hover {
+		background: #555;
+	}
 `;
 
 const PlaceInfo2 = styled.div`
@@ -188,7 +212,7 @@ export default function PlaceLists({ placeData, totalGuest }) {
 								<FiMapPin /> {place.address}
 							</InformationHolder>
 							<InformationHolder>
-								<IoIosInformationCircleOutline /> {place.description}
+								<IoIosInformationCircleOutline />  {place.description}
 							</InformationHolder>
 							<InformationHolder>
 								<TiContacts /> {place.phone} {rendered_email}
