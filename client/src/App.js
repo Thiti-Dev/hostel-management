@@ -28,6 +28,7 @@ import DecodedJWT from './utils/DecodedJWT';
 import EditProfile from './components/EditProfile';
 import CreateHostel from './components/CreateHostel';
 import Profile from './components/Profile';
+import Hostel from './components/Hostel';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
@@ -68,6 +69,7 @@ class App extends React.Component {
 						<PrivateRoute exact path="/profile/edit" component={EditProfile} />
 						<PrivateRoute exact path="/hostel/create" component={CreateHostel} />
 						<PrivateRoute exact path="/user/:username" component={Profile} />
+						<PrivateRoute exact path="/hostel/:hostelName" component={Hostel} />
 					</Switch>
 				</Router>
 			</Provider>
