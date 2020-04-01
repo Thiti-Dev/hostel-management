@@ -3,6 +3,13 @@ const asyncHandler = require('../middleware/async');
 const Hostel = require('../models/Hostel');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
+
+const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+
+function getTotalDayBetweenDate(firstDate, secondDate) {
+	return Math.round(Math.abs((firstDate - secondDate) / oneDay));
+}
+
 // @desc    Book a hostel
 // @route   POST /api/hostels/:hostelId/booking
 // @acess   Private
@@ -14,6 +21,11 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 	req.body.user = req.body.user || req.user.id;
 	req.body.hostel = req.body.hostel || hostelId; // append to body
 	// ────────────────────────────────────────────────────────────────────────────────
+
+	const hostel = await Hostel.findById(hostelId);
+	if (!hostel) {
+		return next(new ErrorResponse(`Hostel with id ${hostelId} is not exist`, 404));
+	}
 
 	// @TODO => Check again here if can proceed => ( prevent use from using any api requester to directly book the hostel) [ DONE ] [ CODE BELOW ]
 	// @DONE PREVENTION
@@ -28,6 +40,15 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 	if (isAlreadyBook) {
 		return next(new ErrorResponse(`Cannot book more than once in the same period of time of the same hostel`, 400));
 	}
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	//
+	// ─── CALC PRICE ─────────────────────────────────────────────────────────────────
+	//
+	req.body.totalPrice =
+		getTotalDayBetweenDate(new Date(req.body.checkIn), new Date(req.body.checkOut)) *
+		hostel.price *
+		req.body.totalGuest;
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	const booked_hostel = await Booking.create(req.body);
