@@ -45,7 +45,10 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 // @acess   Public
 exports.getHostelDetailFromSlug = asyncHandler(async (req, res, next) => {
 	const { slug } = req.params;
-	const hostel = await Hostel.findOne({ slug }); // sort by the lastest one that had been created
+	const hostel = await Hostel.findOne({ slug }).populate({
+		path: 'owner',
+		select: 'username'
+	}); // sort by the lastest one that had been created
 
 	if (!hostel) {
 		return next(new ErrorResponse(`Hostel with slug > ${slug} < is not exist in the database`, 404));

@@ -245,7 +245,11 @@ class Home extends React.Component {
 						</SearchContainer>
 					</Parallax>
 					<Container>
-						<PlaceLists placeData={this.state.placesData} totalGuest={this.state.totalGuest} />
+						<PlaceLists
+							history={this.props.history}
+							placeData={this.state.placesData}
+							totalGuest={this.state.totalGuest}
+						/>
 					</Container>
 				</Container>
 			</React.Fragment>

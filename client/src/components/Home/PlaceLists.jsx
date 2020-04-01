@@ -179,7 +179,7 @@ const FetchedInformation = styled.h1`
 	font-family: 'Courier New', Courier, monospace;
 	margin-top: 3rem;
 `;
-export default function PlaceLists({ placeData, totalGuest }) {
+export default function PlaceLists({ placeData, totalGuest, history }) {
 	const [ modalData, setModalData ] = React.useState({});
 	const [ modalShow, setModalShow ] = React.useState(false);
 	const onBookProcess = (data) => {
@@ -212,7 +212,7 @@ export default function PlaceLists({ placeData, totalGuest }) {
 								<FiMapPin /> {place.address}
 							</InformationHolder>
 							<InformationHolder>
-								<IoIosInformationCircleOutline />  {place.description}
+								<IoIosInformationCircleOutline /> {place.description}
 							</InformationHolder>
 							<InformationHolder>
 								<TiContacts /> {place.phone} {rendered_email}
@@ -231,6 +231,7 @@ export default function PlaceLists({ placeData, totalGuest }) {
 								action={(element, next) =>
 									setTimeout(() => {
 										//awesome_button_middleware = next;
+										history.push(`/hostel/${place.slug}`);
 										next();
 									}, 500)}
 								loadingLabel="Getting more information . . ."

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
 	//Button,
 	//Jumbotron,
@@ -20,6 +21,7 @@ import {
 } from 'react-bootstrap';
 import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
+import Moment from 'react-moment';
 //
 // ─── STYLING ────────────────────────────────────────────────────────────────────
 //
@@ -31,10 +33,10 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 import { FaSearchLocation, FaRegCalendarAlt } from 'react-icons/fa';
-import { IoMdPeople, IoIosInformationCircleOutline, IoIosPeople, IoIosCloudyNight } from 'react-icons/io';
+import { IoMdPeople, IoIosInformationCircleOutline, IoIosPeople, IoIosCloudyNight, IoMdLogIn } from 'react-icons/io';
 import { FiMapPin } from 'react-icons/fi';
 import { GiMoneyStack, GiTakeMyMoney } from 'react-icons/gi';
-import { MdMoveToInbox, MdUpdate } from 'react-icons/md';
+import { MdMoveToInbox, MdUpdate, MdPersonOutline } from 'react-icons/md';
 import { FiBox, FiPhone } from 'react-icons/fi';
 import { GoLocation } from 'react-icons/go';
 import { AiOutlineMail } from 'react-icons/ai';
@@ -84,75 +86,116 @@ export default class Hostel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			currentAction: 'details'
+			currentAction: 'details',
+			hostelDetail: null,
+			totalBooked: 0
 		};
 	}
 	onChangeAction(action) {
 		console.log('Changing action to : ' + action);
 		this.setState({ currentAction: action });
 	}
+
+	async fetchHostelData(slug) {
+		try {
+			const detail_request = await axios.get(`/api/hostels/${slug}`);
+			console.log(detail_request);
+			this.setState({ hostelDetail: detail_request.data.data, totalBooked: detail_request.data.total_booked });
+		} catch (error) {
+			// Redirect to page not found
+		}
+	}
+
+	componentDidMount() {
+		console.log(this.props.match.params.hostelSlug);
+		this.fetchHostelData(this.props.match.params.hostelSlug);
+	}
 	render() {
-		const { currentAction } = this.state;
+		const { currentAction, hostelDetail, totalBooked } = this.state;
 		let rendered_content;
 		if (currentAction === 'details') {
-			rendered_content = (
-				<React.Fragment>
-					<p style={{ padding: '1rem', marginTop: '1rem' }}>
-						<IoIosInformationCircleOutline /> A lot of rooms that you can share together with roommate,
-						pool, BBQ Pot
-						<br />
-						<br />
-						<IoIosPeople /> Total 52 people booked this hostel
-						<br />
-						<br />
-						<MdUpdate /> Published on 1 Jan 2018
-					</p>
-				</React.Fragment>
-			);
+			if (!hostelDetail) {
+				rendered_content = <Spinner style={{ textAlign: 'center' }} animation="border" variant="secondary" />;
+			} else {
+				rendered_content = (
+					<React.Fragment>
+						<p style={{ padding: '1rem', marginTop: '1rem' }}>
+							<IoIosInformationCircleOutline /> {hostelDetail.description}
+							<br />
+							<br />
+							<IoMdLogIn /> This hostel has been booked {totalBooked} times
+							<br />
+							<br />
+							<MdUpdate /> Published on{' '}
+							<Moment format="D MMMM YYYY" withTitle>
+								{hostelDetail.createdAt}
+							</Moment>
+							<br />
+							<br />
+							<MdPersonOutline />{' '}
+							<Link to={`/user/${hostelDetail.owner.username}`}>{hostelDetail.owner.username}</Link> is
+							the owner
+						</p>
+					</React.Fragment>
+				);
+			}
 		} else {
 			rendered_content = <Comment />;
+		}
+		let rendered_hostel_detail;
+		if (!hostelDetail) {
+			rendered_hostel_detail = <Spinner style={{ textAlign: 'center' }} animation="border" variant="secondary" />;
+		} else {
+			rendered_hostel_detail = (
+				<React.Fragment>
+					<Row style={{ textAlign: 'center' }}>
+						<Col md={12}>
+							<Image src={`/uploads/${hostelDetail.photo}`} rounded width="280" height="220" />
+						</Col>
+					</Row>
+					<Row style={{ textAlign: 'center' }}>
+						<Col md={12}>
+							<CustomNameLabel>{hostelDetail.name}</CustomNameLabel>
+						</Col>
+					</Row>
+					<Row style={{ textAlign: 'left', marginTop: '1rem' }}>
+						<Col md={12}>
+							<ul>
+								<li>
+									<GiMoneyStack /> {hostelDetail.price} baht / night
+								</li>
+								<br />
+								<li>
+									<FiBox /> Capacity: {hostelDetail.capacity} people
+								</li>
+								<br />
+								{hostelDetail.phone ? (
+									<React.Fragment>
+										<li>
+											<FiPhone /> {hostelDetail.phone}
+										</li>
+										<br />
+									</React.Fragment>
+								) : null}
+
+								{hostelDetail.email ? (
+									<React.Fragment>
+										<li>
+											<AiOutlineMail /> {hostelDetail.email}
+										</li>
+										<br />
+									</React.Fragment>
+								) : null}
+							</ul>
+						</Col>
+					</Row>
+				</React.Fragment>
+			);
 		}
 		return (
 			<React.Fragment>
 				<OutestContainer fluid>
-					<UserNavColumn2>
-						<Row style={{ textAlign: 'center' }}>
-							<Col md={12}>
-								<Image
-									src={`/uploads/photo_5e80ac613cf8003f60ea5140.jpg`}
-									rounded
-									width="280"
-									height="220"
-								/>
-							</Col>
-						</Row>
-						<Row style={{ textAlign: 'center' }}>
-							<Col md={12}>
-								<CustomNameLabel>The Ayutthaya Hostel</CustomNameLabel>
-							</Col>
-						</Row>
-						<Row style={{ textAlign: 'left', marginTop: '1rem' }}>
-							<Col md={12}>
-								<ul>
-									<li>
-										<GiMoneyStack /> 900 baht / night
-									</li>
-									<br />
-									<li>
-										<FiBox /> Capacity: 15 people
-									</li>
-									<br />
-									<li>
-										<FiPhone /> 0946753822
-									</li>
-									<br />
-									<li>
-										<AiOutlineMail /> adm@admin.in.th
-									</li>
-								</ul>
-							</Col>
-						</Row>
-					</UserNavColumn2>
+					<UserNavColumn2>{rendered_hostel_detail}</UserNavColumn2>
 					<ContentContainer fluid>
 						<Nav variant="tabs" defaultActiveKey="details">
 							<Nav.Item>
