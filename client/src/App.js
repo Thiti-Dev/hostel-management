@@ -67,7 +67,7 @@ class App extends React.Component {
 						<Route exact path="/login" component={Login} />
 						<PrivateRoute exact path="/home" component={Home} />
 						<PrivateRoute exact path="/profile/edit" component={EditProfile} />
-						<PrivateRoute exact path="/hostel/create" component={CreateHostel} />
+						<PrivateRoute exact path="/create/hostel" component={CreateHostel} />
 						<PrivateRoute exact path="/user/:username" component={Profile} />
 						<PrivateRoute exact path="/hostel/:hostelName" component={Hostel} />
 					</Switch>
