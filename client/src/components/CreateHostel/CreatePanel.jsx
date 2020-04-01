@@ -1,5 +1,6 @@
 import React, { Component, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
 import {
 	//Button,
 	//Jumbotron,
@@ -34,7 +35,23 @@ const RequiredText = styled.span`
 	color: red;
 	white-space: nowrap;
 `;
+
+const text_truncate = function(str, length, ending) {
+	if (length == null) {
+		length = 100;
+	}
+	if (ending == null) {
+		ending = '...';
+	}
+	if (str.length > length) {
+		return str.substring(0, length - ending.length) + ending;
+	} else {
+		return str;
+	}
+};
+
 export default function CreatePanel({ history }) {
+	const _authState = useSelector((state) => state.auth);
 	const [ previewImg, setPreviewImg ] = useState(
 		'https://q-cf.bstatic.com/images/hotel/max1024x768/204/204628111.jpg'
 	);
@@ -101,12 +118,19 @@ export default function CreatePanel({ history }) {
 					showConfirmButton: false,
 					timer: 2000
 				});
+				setTimeout(() => {
+					history.push(`/user/${_authState.user.username}?action=published`);
+				}, 2000);
 			} catch (error) {
+				let error_msg = error.response.data.errors || 'Server Error';
+				if (error_msg.includes('Duplicate')) {
+					error_msg = 'This Hostel name is already exist';
+				}
 				MySwal.fire({
 					position: 'center',
 					icon: 'error',
-					title: 'Server Error',
-					text: 'Try creating hostel later . . .',
+					title: 'Error Occured',
+					text: error_msg,
 					showConfirmButton: false,
 					timer: 2000
 				});
@@ -163,7 +187,13 @@ export default function CreatePanel({ history }) {
 							<Form.File
 								onChange={onImageChange}
 								id="custom-file"
-								label={!hostelDetails.photo ? 'Select hostel photo' : hostelDetails.photo.name}
+								label={
+									!hostelDetails.photo ? (
+										'Select hostel photo'
+									) : (
+										text_truncate(hostelDetails.photo.name, 20)
+									)
+								}
 								custom
 							/>
 						</Col>
@@ -250,7 +280,7 @@ export default function CreatePanel({ history }) {
 					</Form.Label>
 					<Col md={6}>
 						<Form.Control
-							type="number"
+							type="text"
 							placeholder="Phone number"
 							name="phone"
 							onChange={formInputHandler}
