@@ -40,6 +40,24 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 	}
 });
 
+// @desc    Get a hostel details/information
+// @route   GET /api/hostels/:slug
+// @acess   Public
+exports.getHostelDetailFromSlug = asyncHandler(async (req, res, next) => {
+	const { slug } = req.params;
+	const hostel = await Hostel.findOne({ slug }); // sort by the lastest one that had been created
+	let total_booked = null;
+	if (hostel) {
+		// if found => fetched the total booked also
+		total_booked = await Booking.find({ hostel: hostel._id });
+	}
+	res.status(200).json({
+		success: true,
+		data: hostel,
+		total_booked: total_booked ? total_booked.length : null
+	});
+});
+
 // @desc    Create sigle hostel
 // @route   POST /api/hostels/
 // @acess   Private
