@@ -4,6 +4,8 @@ const Hostel = require('../models/Hostel');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 
+var ObjectId = require('mongodb').ObjectID;
+
 const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
 
 function getTotalDayBetweenDate(firstDate, secondDate) {
@@ -40,6 +42,43 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 	if (isAlreadyBook) {
 		return next(new ErrorResponse(`Cannot book more than once in the same period of time of the same hostel`, 400));
 	}
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	//
+	// ─── CHECK AGAIN IF THERE IS REALLY AN AVIALABLE SPACE FOR USER ─────────────────
+	// @Prevent from Hi-jacking slot by send the request directly (frontend-ignored)
+
+	const totalPeople = await Booking.aggregate([
+		// Limit to relevant documents and potentially take advantage of an index
+		{
+			$match: {
+				hostel: ObjectId(hostelId),
+				$or: [
+					{ checkOut: { $gte: new Date(req.body.checkOut) }, checkIn: { $lt: new Date(req.body.checkOut) } },
+					{ checkIn: { $lte: new Date(req.body.checkIn) }, checkOut: { $gt: new Date(req.body.checkIn) } }
+				]
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				total: { $sum: '$totalGuest' }
+			}
+		}
+	]);
+
+	let totalPeopleBooked = 0; // default
+	if (totalPeople.length > 0) {
+		totalPeopleBooked = totalPeople[0].total;
+	}
+
+	const remain_capacity = hostel.capacity - totalPeopleBooked;
+	const remain_capacity_include_current = remain_capacity - req.body.totalGuest;
+
+	if (remain_capacity_include_current < 0) {
+		return next(new ErrorResponse(`There is no avialable space for you right now`, 400));
+	}
+
 	// ────────────────────────────────────────────────────────────────────────────────
 
 	//
