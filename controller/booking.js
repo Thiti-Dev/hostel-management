@@ -15,6 +15,21 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 	req.body.hostel = req.body.hostel || hostelId; // append to body
 	// ────────────────────────────────────────────────────────────────────────────────
 
+	// @TODO => Check again here if can proceed => ( prevent use from using any api requester to directly book the hostel) [ DONE ] [ CODE BELOW ]
+	// @DONE PREVENTION
+	let isAlreadyBook = await Booking.findOne({
+		hostel: hostelId,
+		user: req.user.id,
+		$or: [
+			{ checkOut: { $gte: req.body.checkOut }, checkIn: { $lt: req.body.checkOut } },
+			{ checkIn: { $lte: req.body.checkIn }, checkOut: { $gt: req.body.checkIn } }
+		]
+	});
+	if (isAlreadyBook) {
+		return next(new ErrorResponse(`Cannot book more than once in the same period of time of the same hostel`, 400));
+	}
+	// ────────────────────────────────────────────────────────────────────────────────
+
 	const booked_hostel = await Booking.create(req.body);
 
 	res.status(201).json({
