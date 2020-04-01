@@ -111,15 +111,19 @@ export default class BookHistory extends Component {
 		};
 		this.filterTheHistory = this.filterTheHistory.bind(this);
 	}
+
+	componentDidMount() {
+		// Re-filtering when user just switched from another nav (action)
+		this.filterTheHistory(1);
+	}
+
 	componentWillReceiveProps(nextProps) {
 		const { filterType } = this.state;
-
 		// Called twice => once when the null is initialized in => after that whenever the props is update by its parent this will be called again
 		if (nextProps.booking_history) {
 			//filted to called once => when the booking_history is successfully fetched
 			this.setState({ pureHistory: nextProps.booking_history }, () => {
 				this.filterTheHistory(1);
-				//console.log(this.state.pureHistory);
 			});
 		}
 		//this.filterTheHistory(filterType); // filter everytime that component got update
@@ -131,26 +135,26 @@ export default class BookHistory extends Component {
 		// 2 == filter by past => checkIn < Date.now()
 		// 3 == see all => no filter needed
 		this.setState({ filterType: type });
-		if (this.state.pureHistory) {
+		if (this.props.booking_history) {
 			// If recieved the booking history
 			let result;
 			switch (type) {
 				case 1:
-					result = this.state.pureHistory.filter((booking) => {
+					result = this.props.booking_history.filter((booking) => {
 						return new Date(booking.checkIn) >= new Date();
 					});
 					this.setState({ renderedHistory: result });
 					break;
 				case 2:
-					result = this.state.pureHistory.filter((booking) => new Date(booking.checkOut) < new Date());
+					result = this.props.booking_history.filter((booking) => new Date(booking.checkOut) < new Date());
 					this.setState({ renderedHistory: result });
 					break;
 				case 3:
-					result = this.state.pureHistory;
+					result = this.props.booking_history;
 					this.setState({ renderedHistory: result });
 					break;
 				case 4:
-					result = this.state.pureHistory.filter((booking) => {
+					result = this.props.booking_history.filter((booking) => {
 						return (
 							(new Date(booking.checkIn) <= new Date() || isToday(new Date(booking.checkIn))) &&
 							new Date(booking.checkOut) > new Date()
@@ -231,7 +235,9 @@ export default class BookHistory extends Component {
 						</Nav.Link>
 					</Nav.Item>
 				</Nav>
-				<HistoryHolderContainer>{rendered_history}</HistoryHolderContainer>
+				<HistoryHolderContainer>
+					{rendered_history.length > 0 ? rendered_history : <p>No activity for a moment</p>}
+				</HistoryHolderContainer>
 			</React.Fragment>
 		);
 	}

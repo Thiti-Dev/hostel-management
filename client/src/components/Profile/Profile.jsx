@@ -29,6 +29,7 @@ import { fade_move_down } from '../../styles/Keyframe';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import BookHistory from './BookHistory';
+import Published from './Published';
 const MySwal = withReactContent(Swal);
 
 const UserNavColumn = styled(Col)`
@@ -98,7 +99,9 @@ export default class Profile extends Component {
 		this.state = {
 			isLoading: true, //  still loading by default
 			profileData: null,
-			bookingHistory: null
+			bookingHistory: null,
+			publishedHistory: null,
+			currentAction: 'history'
 		};
 	}
 
@@ -122,12 +125,38 @@ export default class Profile extends Component {
 		}
 	}
 
+	async getUserPublishedHostel(username) {
+		try {
+			const profile_request = await axios.get(`/api/users/${username}/hostel`);
+			const publishedHistory = profile_request.data.data;
+			//console.log(publishedHistory);
+			this.setState({ publishedHistory });
+		} catch (error) {
+			console.log(error.response);
+		}
+	}
+
 	componentDidMount() {
+		// Consequence in order
+		// @! Don't want it to fetch when just clicked to switch from booking => published ( prevention of spamming request sent)
 		this.getUserProfileDetails(this.props.match.params.username);
 		this.getUserBookingHistory(this.props.match.params.username);
+		this.getUserPublishedHostel(this.props.match.params.username);
+		// ------
 	}
+
+	onNavClicked(action) {
+		if (action === 'history') {
+			// User trying to view the booking history of the current user
+			this.setState({ currentAction: 'history' });
+		} else {
+			// If user is viewing the published of that user
+			this.setState({ currentAction: 'published' });
+		}
+	}
+
 	render() {
-		const { profileData, bookingHistory } = this.state;
+		const { profileData, bookingHistory, currentAction, publishedHistory } = this.state;
 		let rendered_profile;
 
 		if (!profileData) {
@@ -159,20 +188,35 @@ export default class Profile extends Component {
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
 							<CustomUlHolder>
-								<CustomNavList active>Booking History</CustomNavList>
-								<CustomNavList>Published Hostel</CustomNavList>
+								<CustomNavList
+									active={currentAction === 'history' ? true : false}
+									onClick={() => this.onNavClicked('history')}
+								>
+									Booking History
+								</CustomNavList>
+								<CustomNavList
+									active={currentAction === 'published' ? true : false}
+									onClick={() => this.onNavClicked('published')}
+								>
+									Published Hostel
+								</CustomNavList>
 							</CustomUlHolder>
 						</Col>
 					</Row>
 				</React.Fragment>
 			);
 		}
+
+		let rendered_action;
+		if (currentAction === 'history') {
+			rendered_action = <BookHistory booking_history={bookingHistory} />;
+		} else {
+			rendered_action = <Published published_history={publishedHistory} />;
+		}
 		return (
 			<OutestContainer fluid>
 				<UserNavColumn2>{rendered_profile}</UserNavColumn2>
-				<ContentContainer fluid>
-					<BookHistory booking_history={bookingHistory} />
-				</ContentContainer>
+				<ContentContainer fluid>{rendered_action}</ContentContainer>
 			</OutestContainer>
 		);
 	}
