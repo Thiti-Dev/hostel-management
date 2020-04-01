@@ -4,6 +4,8 @@ import user from './assets/user.png';
 import edit_account from './assets/edit-account.png';
 import logout from './assets/logout.png';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import cookie from 'react-cookies';
 const List = styled.ul`
 	display: flex;
 	flex-direction: column;
@@ -36,17 +38,25 @@ const StyledLink = styled.a`
 `;
 
 export default ({ gotoroute }) => {
+	const _authState = useSelector((state) => state.auth);
+
+	const onLogOut = () => {
+		//  remove the user token and then refresh the page
+		cookie.remove('token', { path: '/' });
+		window.location.reload(false); // reloading after the cookie is removed => automatically un-authenticated and will be redirecting to the login page
+	};
+
 	return (
 		<List>
 			<ListItem>
 				<img src={user} width={24} height={24} />
-				<Heading>aaw0kenn</Heading>
+				<Heading>{_authState.user.username}</Heading>
 			</ListItem>
 			<ListItem onClick={() => gotoroute('/profile/edit')}>
 				<img src={edit_account} width={24} height={24} />
 				<Heading>Edit account</Heading>
 			</ListItem>
-			<ListItem>
+			<ListItem onClick={() => onLogOut()}>
 				<img src={logout} width={24} height={24} />
 				<Heading>Log Out</Heading>
 			</ListItem>
