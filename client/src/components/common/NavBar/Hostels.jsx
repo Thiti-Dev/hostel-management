@@ -53,21 +53,26 @@ export default () => {
 						<img src={partner} width={48} height={48} />
 						<LisItemHeadingText>
 							<ListItemHeading>HOW TO BECOME A PARTNER</ListItemHeading>
-							<div>FAQ, on how to become part of us.</div>
+							<div>Just published atleast 1 hostel, how easy?</div>
 						</LisItemHeadingText>
 					</ListItemContent>
 				</li>
 				<li>
-					<ListItemContent>
-						<img src={add} width={48} height={48} />
-						<LisItemHeadingText>
-							<ListItemHeading>HOST A PLACE</ListItemHeading>
-							<div>Add your own place, and profit with us.</div>
-						</LisItemHeadingText>
-					</ListItemContent>
+					<Link style={{ color: 'inherit', textDecoration: 'inherit' }} to={`/hostel/create`}>
+						<ListItemContent>
+							<img src={add} width={48} height={48} />
+							<LisItemHeadingText>
+								<ListItemHeading>HOST A PLACE</ListItemHeading>
+								<div>Add your own place, and profit with us.</div>
+							</LisItemHeadingText>
+						</ListItemContent>
+					</Link>
 				</li>
 				<li>
-					<Link to={`/user/${_authState.user.username}?action=published`}>
+					<Link
+						style={{ color: 'inherit', textDecoration: 'inherit' }}
+						to={`/user/${_authState.user.username}?action=published`}
+					>
 						<ListItemContent>
 							<img src={myplace} width={48} height={48} />
 							<LisItemHeadingText>
