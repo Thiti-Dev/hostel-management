@@ -121,15 +121,24 @@ exports.getCapacityBetweenDate = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Hostel with id: ${hostelId} is not exist`, 404));
 	}
 
-	let isAlreadyBook = await Booking.findOne({ hostel: hostelId, user: req.user.id });
-
-	let fetched_book = await Booking.find({
+	// @comment because => User allows to book the same hostel more than 1 time but in the different period of time
+	//let isAlreadyBook = await Booking.findOne({ hostel: hostelId, user: req.user.id });
+	let isAlreadyBook = await Booking.findOne({
 		hostel: hostelId,
+		user: req.user.id,
 		$or: [
 			{ checkOut: { $gte: end_date }, checkIn: { $lt: end_date } },
 			{ checkIn: { $lte: start_date }, checkOut: { $gt: start_date } }
 		]
 	});
+
+	// let fetched_book = await Booking.find({
+	// 	hostel: hostelId,
+	// 	$or: [
+	// 		{ checkOut: { $gte: end_date }, checkIn: { $lt: end_date } },
+	// 		{ checkIn: { $lte: start_date }, checkOut: { $gt: start_date } }
+	// 	]
+	// });
 
 	const totalPeople = await Booking.aggregate([
 		// Limit to relevant documents and potentially take advantage of an index

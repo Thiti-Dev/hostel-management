@@ -170,7 +170,7 @@ function BookModal(props) {
 		</Button>
 	) : (
 		<Button variant="warning" disabled>
-			Already booked
+			Already booked in this period, choose a different time
 		</Button>
 	);
 
