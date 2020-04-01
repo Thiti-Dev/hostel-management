@@ -3,6 +3,7 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import { setCurrentSearchData } from '../../redux/actions/mainActions';
 import { withRouter } from 'react-router-dom';
+import { Fab, Action } from 'react-tiny-fab';
 import {
 	//Button,
 	//Jumbotron,
@@ -40,12 +41,13 @@ import { Parallax, Background } from 'react-parallax';
 import DatePicker from 'react-date-picker';
 // ────────────────────────────────────────────────────────────────────────────────
 
-import { FaSearchLocation, FaRegCalendarAlt } from 'react-icons/fa';
+import { FaSearchLocation, FaRegCalendarAlt, FaHistory } from 'react-icons/fa';
 import { IoMdPeople, IoIosInformationCircleOutline, IoIosPeople } from 'react-icons/io';
-import { FiMapPin } from 'react-icons/fi';
+import { FiMapPin, FiNavigation2 } from 'react-icons/fi';
 import { TiContacts } from 'react-icons/ti';
 import { AiOutlineMail } from 'react-icons/ai';
 import { GiMoneyStack, GiTakeMyMoney } from 'react-icons/gi';
+import { MdPersonOutline } from 'react-icons/md';
 //
 // ─── MY OWN LIB ─────────────────────────────────────────────────────────────────
 //
@@ -115,11 +117,30 @@ class Home extends React.Component {
 			});
 		} catch (err) {}
 	}
+
+	goToMyProfile() {
+		this.props.history.push(`/user/${this.props.auth.user.username}`);
+	}
 	render() {
 		let { startDate, endDate, totalGuest, searchStr } = this.state;
 		return (
 			<React.Fragment>
 				<NavBar />
+
+				<Fab icon={<FiNavigation2 />} mainButtonStyles={{ backgroundColor: '#ff0000' }}>
+					<Action
+						style={{
+							backgroundColor: '#89db42',
+							backgroundImage:
+								"url('https://avatars1.githubusercontent.com/u/36455825?s=460&u=7d01e09a590eba9ac70883c31990afeaf30d4b95&v=4')",
+							backgroundPosition: 'center',
+							backgroundSize: 'contain'
+						}}
+						text="My profile"
+						onClick={() => this.goToMyProfile()}
+					/>
+				</Fab>
+
 				<Container fluid style={{ margin: 0, padding: 0 }}>
 					<Parallax bgImage={mainParallax} strength={400} blur={{ min: -10, max: 15 }}>
 						<div style={{ height: '100vh' }} />
@@ -233,6 +254,7 @@ class Home extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-	action: state.action
+	action: state.action,
+	auth: state.auth
 });
 export default connect(mapStateToProps, { setCurrentSearchData })(Home);

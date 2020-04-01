@@ -27,8 +27,8 @@ export class NavBar extends Component {
 	constructor(props) {
 		super(props);
 	}
-	goToRoute() {
-		this.props.history.push('/profile/edit');
+	goToRoute(route) {
+		this.props.history.push(route);
 	}
 	render() {
 		return (

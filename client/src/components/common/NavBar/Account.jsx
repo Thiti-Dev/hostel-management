@@ -48,7 +48,7 @@ export default ({ gotoroute }) => {
 
 	return (
 		<List>
-			<ListItem>
+			<ListItem onClick={() => gotoroute(`/user/${_authState.user.username}`)}>
 				<img src={user} width={24} height={24} />
 				<Heading>{_authState.user.username}</Heading>
 			</ListItem>
