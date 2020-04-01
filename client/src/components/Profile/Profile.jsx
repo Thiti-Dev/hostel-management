@@ -30,6 +30,9 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import BookHistory from './BookHistory';
 import Published from './Published';
+
+import queryString from 'query-string';
+
 const MySwal = withReactContent(Swal);
 
 const UserNavColumn = styled(Col)`
@@ -143,6 +146,15 @@ export default class Profile extends Component {
 		this.getUserBookingHistory(this.props.match.params.username);
 		this.getUserPublishedHostel(this.props.match.params.username);
 		// ------
+		const values = queryString.parse(this.props.location.search);
+		if (values.action) {
+			// recieved the action from given query
+			if (values.action === 'published') {
+				this.setState({ currentAction: 'published' });
+				// Silent the url-action (query)
+				window.history.pushState(null, '', `/user/${this.props.match.params.username}`);
+			}
+		}
 	}
 
 	onNavClicked(action) {

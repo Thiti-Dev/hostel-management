@@ -5,6 +5,7 @@ import payment from './assets/payment.png';
 import partner from './assets/partner.png';
 import myplace from './assets/checklist.png';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 const ListContainer = styled.div`
 	display: flex;
 	height: 100%;
@@ -43,6 +44,7 @@ const ListItemHeading = styled.div`
 `;
 
 export default () => {
+	const _authState = useSelector((state) => state.auth);
 	return (
 		<ListContainer>
 			<List>
@@ -65,13 +67,15 @@ export default () => {
 					</ListItemContent>
 				</li>
 				<li>
-					<ListItemContent>
-						<img src={myplace} width={48} height={48} />
-						<LisItemHeadingText>
-							<ListItemHeading>MY HOSTELS</ListItemHeading>
-							<div>See the lists of your hostel.</div>
-						</LisItemHeadingText>
-					</ListItemContent>
+					<Link to={`/user/${_authState.user.username}?action=published`}>
+						<ListItemContent>
+							<img src={myplace} width={48} height={48} />
+							<LisItemHeadingText>
+								<ListItemHeading>MY HOSTELS</ListItemHeading>
+								<div>See the lists of your hostel.</div>
+							</LisItemHeadingText>
+						</ListItemContent>
+					</Link>
 				</li>
 			</List>
 		</ListContainer>
