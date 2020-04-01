@@ -20,6 +20,7 @@ import {
 } from 'react-bootstrap';
 import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
+import Moment from 'react-moment';
 //
 // ─── STYLING ────────────────────────────────────────────────────────────────────
 //
@@ -79,7 +80,7 @@ const BookedHolder = styled.div`
 const CustomPhotoInside = styled.div`
 	background-size: cover;
 	background-position: center;
-	background-image: url('https://storage.googleapis.com/chydlx/codepen/blog-cards/image-1.jpg');
+background-image: url('${(props) => props.photo_url}');
 	height: 100%;
 	width: 23%;
 	border-radius: 1rem;
@@ -89,143 +90,139 @@ const CustomInformationBox = styled.div`
 	margin-top: 0.5rem;
 `;
 
+const isToday = (someDate) => {
+	const today = new Date();
+	return (
+		someDate.getDate() == today.getDate() &&
+		someDate.getMonth() == today.getMonth() &&
+		someDate.getFullYear() == today.getFullYear()
+	);
+};
+
 export default class BookHistory extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			filterType: 1,
+			renderedHistory: null,
+			pureHistory: null
+		};
+		this.filterTheHistory = this.filterTheHistory.bind(this);
+	}
+	componentWillReceiveProps(nextProps) {
+		const { filterType } = this.state;
+
+		// Called twice => once when the null is initialized in => after that whenever the props is update by its parent this will be called again
+		if (nextProps.booking_history) {
+			//filted to called once => when the booking_history is successfully fetched
+			this.setState({ pureHistory: nextProps.booking_history }, () => {
+				this.filterTheHistory(1);
+				//console.log(this.state.pureHistory);
+			});
+		}
+		//this.filterTheHistory(filterType); // filter everytime that component got update
+	}
+
+	filterTheHistory(type) {
+		// @TYPE
+		// 1 == filter by upcoming => checkIn >= Date.now()
+		// 2 == filter by past => checkIn < Date.now()
+		// 3 == see all => no filter needed
+		this.setState({ filterType: type });
+		if (this.state.pureHistory) {
+			// If recieved the booking history
+			let result;
+			switch (type) {
+				case 1:
+					result = this.state.pureHistory.filter((booking) => {
+						return new Date(booking.checkIn) >= new Date();
+					});
+					this.setState({ renderedHistory: result });
+					break;
+				case 2:
+					result = this.state.pureHistory.filter((booking) => new Date(booking.checkOut) < new Date());
+					this.setState({ renderedHistory: result });
+					break;
+				case 3:
+					result = this.state.pureHistory;
+					this.setState({ renderedHistory: result });
+					break;
+				case 4:
+					result = this.state.pureHistory.filter((booking) => {
+						return (
+							(new Date(booking.checkIn) <= new Date() || isToday(new Date(booking.checkIn))) &&
+							new Date(booking.checkOut) > new Date()
+						);
+					});
+					this.setState({ renderedHistory: result });
+					break;
+				default:
+					break;
+			}
+		}
+	}
 	render() {
+		const { renderedHistory, pureHistory } = this.state;
+		let rendered_history;
+		if (!renderedHistory) {
+			rendered_history = <Spinner style={{ textAlign: 'center' }} animation="border" variant="secondary" />;
+		} else {
+			rendered_history = renderedHistory.map((booking, key) => {
+				return (
+					<React.Fragment key={key}>
+						<BookedHolder>
+							<CustomPhotoInside photo_url={`/uploads/${booking.hostel.photo}`} />
+							<CustomInformationBox>
+								<GoLocation /> {booking.hostel.name}
+								<ul>
+									<li>
+										<FaRegCalendarAlt />{' '}
+										<Moment format="D MMM YYYY" withTitle>
+											{booking.checkIn}
+										</Moment>{' '}
+										-{' '}
+										<Moment format="D MMM YYYY" withTitle>
+											{booking.checkOut}
+										</Moment>
+									</li>
+									<li>
+										<IoMdPeople /> {booking.totalGuest} people
+									</li>
+									<li>
+										<GiTakeMyMoney /> Spent {booking.totalPrice} baht
+									</li>
+								</ul>
+							</CustomInformationBox>
+						</BookedHolder>
+					</React.Fragment>
+				);
+			});
+		}
 		return (
 			<React.Fragment>
 				<Nav variant="tabs" defaultActiveKey="upcoming">
 					<Nav.Item>
-						<Nav.Link eventKey="upcoming">Up-coming</Nav.Link>
+						<Nav.Link eventKey="upcoming" onClick={() => this.filterTheHistory(1)}>
+							Up-coming (Future)
+						</Nav.Link>
 					</Nav.Item>
 					<Nav.Item>
-						<Nav.Link eventKey="past">Past</Nav.Link>
+						<Nav.Link eventKey="special" onClick={() => this.filterTheHistory(4)}>
+							Currently (Now)
+						</Nav.Link>
 					</Nav.Item>
 					<Nav.Item>
-						<Nav.Link eventKey="all">All</Nav.Link>
+						<Nav.Link eventKey="past" onClick={() => this.filterTheHistory(2)}>
+							Past
+						</Nav.Link>
+					</Nav.Item>
+					<Nav.Item>
+						<Nav.Link eventKey="all" onClick={() => this.filterTheHistory(3)}>
+							All
+						</Nav.Link>
 					</Nav.Item>
 				</Nav>
-				<HistoryHolderContainer>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-					<BookedHolder>
-						<CustomPhotoInside />
-						<CustomInformationBox>
-							<GoLocation /> The Ayutthaya Hostel
-							<ul>
-								<li>
-									<FaRegCalendarAlt /> 25 Apr 2020 - 29 Apr 2020
-								</li>
-								<li>
-									<IoMdPeople /> 5 people
-								</li>
-								<li>
-									<GiTakeMyMoney /> Spent 2500 baht
-								</li>
-							</ul>
-						</CustomInformationBox>
-					</BookedHolder>
-				</HistoryHolderContainer>
+				<HistoryHolderContainer>{rendered_history}</HistoryHolderContainer>
 			</React.Fragment>
 		);
 	}

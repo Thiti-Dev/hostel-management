@@ -93,24 +93,67 @@ const ContentContainer = styled(Container)`
 `;
 
 export default class Profile extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			isLoading: true, //  still loading by default
+			profileData: null,
+			bookingHistory: null
+		};
+	}
+
+	async getUserProfileDetails(username) {
+		try {
+			const profile_request = await axios.get(`/api/users/${username}`);
+			const profileData = profile_request.data.data;
+			this.setState({ profileData });
+		} catch (error) {
+			console.log(error.response);
+		}
+	}
+
+	async getUserBookingHistory(username) {
+		try {
+			const profile_request = await axios.get(`/api/users/${username}/booking`);
+			const bookingHistory = profile_request.data.data;
+			this.setState({ bookingHistory });
+		} catch (error) {
+			console.log(error.response);
+		}
+	}
+
+	componentDidMount() {
+		this.getUserProfileDetails(this.props.match.params.username);
+		this.getUserBookingHistory(this.props.match.params.username);
+	}
 	render() {
-		return (
-			<OutestContainer fluid>
-				<UserNavColumn2>
+		const { profileData, bookingHistory } = this.state;
+		let rendered_profile;
+
+		if (!profileData) {
+			rendered_profile = (
+				<React.Fragment>
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
-							<Image
-								src="https://i1.wp.com/unseenthaisub.com/wp-content/uploads/2017/10/shot_caller_02.jpg"
-								rounded
-								width="280"
-								height="220"
-							/>
+							<Spinner style={{ textAlign: 'center' }} animation="border" variant="secondary" />
+						</Col>
+					</Row>
+				</React.Fragment>
+			);
+		} else {
+			rendered_profile = (
+				<React.Fragment>
+					<Row style={{ textAlign: 'center' }}>
+						<Col md={12}>
+							<Image src={`/uploads/${profileData.photo}`} rounded width="280" height="220" />
 						</Col>
 					</Row>
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
-							<CustomNameLabel>Thiti Mahawannakit</CustomNameLabel>
-							<CustomUserNameLabel>@aaw0kenn</CustomUserNameLabel>
+							<CustomNameLabel>
+								{profileData.firstName} {profileData.lastName}
+							</CustomNameLabel>
+							<CustomUserNameLabel>@{profileData.username}</CustomUserNameLabel>
 						</Col>
 					</Row>
 					<Row style={{ textAlign: 'center' }}>
@@ -121,9 +164,14 @@ export default class Profile extends Component {
 							</CustomUlHolder>
 						</Col>
 					</Row>
-				</UserNavColumn2>
+				</React.Fragment>
+			);
+		}
+		return (
+			<OutestContainer fluid>
+				<UserNavColumn2>{rendered_profile}</UserNavColumn2>
 				<ContentContainer fluid>
-					<BookHistory />
+					<BookHistory booking_history={bookingHistory} />
 				</ContentContainer>
 			</OutestContainer>
 		);
