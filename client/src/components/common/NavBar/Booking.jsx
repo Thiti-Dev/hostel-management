@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Moment from 'react-moment';
 import { fetchBookingHistory } from '../../../redux/actions/bookingActions';
+import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import {
 	//Button,
@@ -29,7 +30,7 @@ import { FiBox } from 'react-icons/fi';
 const BookingHolder = styled(Container)`
 font-size: 0.8rem;
     margin-top: 2rem;
-    height: 90%;
+    height: 85%;
     width:90%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -67,6 +68,14 @@ const NoBookedLabel = styled.p`
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-size: 1rem;
+`;
+
+const CustomViewMoreLabel = styled.p`
+	text-align: center;
+	margin-top: 0.5rem;
+	color: #426ff5;
+	text-decoration: underline;
+	cursor: pointer;
 `;
 
 const dummyData = [
@@ -118,7 +127,7 @@ class Booking extends Component {
 								<FaRegCalendarAlt />{' '}
 								<Moment format="D MMM YYYY" withTitle>
 									{place.checkIn}
-								</Moment>
+								</Moment>{' '}
 								-{' '}
 								<Moment format="D MMM YYYY" withTitle>
 									{place.checkOut}
@@ -135,11 +144,19 @@ class Booking extends Component {
 		} else {
 			rendered_history = <NoBookedLabel>No booking history</NoBookedLabel>;
 		}
-		return <BookingHolder fluid>{rendered_history}</BookingHolder>;
+		return (
+			<React.Fragment>
+				<BookingHolder fluid>{rendered_history}</BookingHolder>
+				<CustomViewMoreLabel onClick={() => this.props.history.push(`/user/${this.props.auth.user.username}`)}>
+					See more in my profile
+				</CustomViewMoreLabel>
+			</React.Fragment>
+		);
 	}
 }
 const mapStateToProps = (state) => ({
-	booking: state.booking
+	booking: state.booking,
+	auth: state.auth
 });
 
-export default connect(mapStateToProps, { fetchBookingHistory })(Booking);
+export default connect(mapStateToProps, { fetchBookingHistory })(withRouter(Booking));
