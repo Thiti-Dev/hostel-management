@@ -46,11 +46,12 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 exports.getHostelDetailFromSlug = asyncHandler(async (req, res, next) => {
 	const { slug } = req.params;
 	const hostel = await Hostel.findOne({ slug }); // sort by the lastest one that had been created
-	let total_booked = null;
-	if (hostel) {
-		// if found => fetched the total booked also
-		total_booked = await Booking.find({ hostel: hostel._id });
+
+	if (!hostel) {
+		return next(new ErrorResponse(`Hostel with slug > ${slug} < is not exist in the database`, 404));
 	}
+
+	const total_booked = await Booking.find({ hostel: hostel._id });
 	res.status(200).json({
 		success: true,
 		data: hostel,
