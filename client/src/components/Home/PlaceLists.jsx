@@ -196,12 +196,12 @@ export default function PlaceLists({ placeData, totalGuest }) {
 						</PlaceInfo>
 						<PlaceInfo2>
 							<InformationHolder>
-								<IoIosPeople /> : 7 total booked <br />
+								{/* <IoIosPeople /> : 7 total booked <br /> */}
 								<GiMoneyStack /> : {place.price} baht / night <br />
-								<GiTakeMyMoney /> : Total {totalGuest * place.price} baht
+								{/* <GiTakeMyMoney /> : Total {totalGuest * place.price} baht */}
 							</InformationHolder>
 							<AwesomeButtonProgress
-								style={{ width: '100%', marginTop: '0rem' }}
+								style={{ width: '100%', marginTop: '1.8rem' }}
 								type="secondary"
 								size="medium"
 								action={(element, next) =>
