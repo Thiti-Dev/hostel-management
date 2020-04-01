@@ -39,6 +39,8 @@ import { MdMoveToInbox } from 'react-icons/md';
 import { FiBox } from 'react-icons/fi';
 import { GoLocation } from 'react-icons/go';
 
+import * as Func from '../../utils/Functions';
+
 const MySwal = withReactContent(Swal);
 
 const HistoryHolderContainer = styled.div`
@@ -183,7 +185,14 @@ export default class BookHistory extends Component {
 										-{' '}
 										<Moment format="D MMM YYYY" withTitle>
 											{booking.checkOut}
-										</Moment>
+										</Moment>{' '}
+										, <IoIosCloudyNight />
+										{'  '}
+										{Func.getTotalDayBetweenDate(
+											new Date(booking.checkIn),
+											new Date(booking.checkOut)
+										)}{' '}
+										night
 									</li>
 									<li>
 										<IoMdPeople /> {booking.totalGuest} people
