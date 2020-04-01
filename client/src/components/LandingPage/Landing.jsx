@@ -43,6 +43,9 @@ import SectionSeparator from '../common/SectionSeparator';
 
 import Register from './Register';
 
+import CountUp from 'react-countup';
+import axios from 'axios';
+
 const TransNav = styled.div`
 	width: 100%;
 	height: 4rem;
@@ -170,10 +173,25 @@ const bgLanding =
 	'https://images.pexels.com/photos/860562/pexels-photo-860562.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940';
 
 function Landing(props) {
+	const [ statisticData, setStatisticData ] = useState(null);
+
+	const fetchStatistic = async () => {
+		try {
+			const fetched_statistic = await axios.get('/api/services/getStatistic');
+			const statistic_data = fetched_statistic.data.data;
+			setStatisticData(statistic_data);
+			console.log(statistic_data);
+		} catch (error) {
+			// This will happen when the server is not response
+		}
+	};
+
 	useEffect(() => {
 		document.title = '🏠 Hosteloga';
+		fetchStatistic();
 	}, []);
 
+	const [ shouldStartCountUp, startCountUp ] = useState(false);
 	const [ scrollPosition, setSrollPosition ] = useState(0);
 	const handleScroll = () => {
 		const position = window.pageYOffset;
@@ -191,6 +209,13 @@ function Landing(props) {
 	const jumpToPage = (routeStr) => {
 		props.history.push(routeStr);
 	};
+
+	const statisticOnScreen = (visible) => {
+		if (visible && !shouldStartCountUp) {
+			startCountUp(true);
+		}
+	};
+
 	return (
 		<Container fluid style={{ margin: 0, padding: 0 }}>
 			{/* <TransNav>
@@ -234,20 +259,34 @@ function Landing(props) {
 				<span>Statistic</span>
 				<UnderlineCenter />
 
-				<StatisticHolder>
-					<div>
-						<StatisticNumber>5</StatisticNumber>
-						<div>Total Hostel</div>
-					</div>
-					<div>
-						<StatisticNumber>28</StatisticNumber>
-						<div>Total Booked</div>
-					</div>
-					<div>
-						<StatisticNumber>45</StatisticNumber>
-						<div>Account Created</div>
-					</div>
-				</StatisticHolder>
+				<OnScreenSensor onChange={statisticOnScreen}>
+					<StatisticHolder>
+						<div>
+							<StatisticNumber>
+								{shouldStartCountUp && statisticData ? (
+									<CountUp end={statisticData.total_hostel} duration={10} />
+								) : null}
+							</StatisticNumber>
+							<div>Total Hostel</div>
+						</div>
+						<div>
+							<StatisticNumber>
+								{shouldStartCountUp && statisticData ? (
+									<CountUp end={statisticData.total_booking} duration={10} />
+								) : null}
+							</StatisticNumber>
+							<div>Total Booked</div>
+						</div>
+						<div>
+							<StatisticNumber>
+								{shouldStartCountUp && statisticData ? (
+									<CountUp end={statisticData.total_user} duration={10} />
+								) : null}
+							</StatisticNumber>
+							<div>Account Created</div>
+						</div>
+					</StatisticHolder>
+				</OnScreenSensor>
 			</CustomSection>
 			<SectionSeparator />
 
