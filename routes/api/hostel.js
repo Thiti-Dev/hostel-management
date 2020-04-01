@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true }); // be able to be re-routed
 const { getAllHostel, createHostel, uploadHostelPhoto, getCapacityBetweenDate } = require('../../controller/hostel');
 const { protect } = require('../../middleware/auth');
 

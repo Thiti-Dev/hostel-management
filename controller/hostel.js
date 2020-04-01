@@ -3,20 +3,41 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Hostel = require('../models/Hostel');
 const Booking = require('../models/Booking');
+const User = require('../models/User');
 
 var ObjectId = require('mongodb').ObjectID;
 // @desc    Get all hostel
 // @route   GET /api/hostels/
 // @acess   Public
 exports.getAllHostel = asyncHandler(async (req, res, next) => {
-	const hostels = await Hostel.find().populate({
-		path: 'owner',
-		select: 'username'
-	});
-	res.status(200).json({
-		success: true,
-		data: hostels
-	});
+	const { username } = req.params;
+
+	// If just fetching in the home-page => which means no username params given from the url
+	if (!username) {
+		const hostels = await Hostel.find().populate({
+			path: 'owner',
+			select: 'username'
+		});
+		res.status(200).json({
+			success: true,
+			data: hostels
+		});
+	} else {
+		//Else if trying to view others people published hostel
+
+		const user = await User.findOne({ username });
+		if (!user) {
+			return next(new ErrorResponse(`Username ${username} is not exist in the database`, 404));
+		}
+		const user_id = user._id;
+
+		const published_hostel = await Hostel.find({ owner: user_id }).sort('-createdAt'); // sort by the lastest one that had been created
+
+		res.status(200).json({
+			success: true,
+			data: published_hostel
+		});
+	}
 });
 
 // @desc    Create sigle hostel
