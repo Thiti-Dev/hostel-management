@@ -173,7 +173,7 @@ function Login(props) {
 							<Form.Check type="checkbox" label="Remember my credential" />
 						</Form.Group>
 						<AwesomeButtonProgress
-							style={{ width: '100%' }}
+							style={{ width: '100%', marginBottom: '0.6rem' }}
 							type="secondary"
 							size="medium"
 							action={(element, next) =>
@@ -186,6 +186,16 @@ function Login(props) {
 						>
 							Sign In
 						</AwesomeButtonProgress>
+						<AwesomeButton
+							style={{ width: '100%' }}
+							type="reddit"
+							size="medium"
+							action={() => props.history.push('/')}
+							loadingLabel="Logging In , Please be patient . . ."
+							resultLabel="👍🏽"
+						>
+							Back to home page
+						</AwesomeButton>
 					</Form>
 					<CustomErrorFeedback>{errorMsg ? errorMsg : null}</CustomErrorFeedback>
 				</CardForm>
