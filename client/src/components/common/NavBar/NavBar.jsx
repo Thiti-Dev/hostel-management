@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SiteNav, { ContentGroup } from 'react-site-nav';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import {
 	//Button,
@@ -23,7 +24,7 @@ import Account from './Account';
 import Admin from './Admin';
 import Booking from './Booking';
 
-export class NavBar extends Component {
+class NavBar extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -31,6 +32,8 @@ export class NavBar extends Component {
 		this.props.history.push(route);
 	}
 	render() {
+		const { user } = this.props.auth;
+		console.log('CURRENT ROLE == ' + user.role);
 		return (
 			<React.Fragment>
 				<div style={{ position: 'absolute', zIndex: '9999' }}>
@@ -44,9 +47,13 @@ export class NavBar extends Component {
 						<ContentGroup title="My Booking" width="500" height="500">
 							<Booking />
 						</ContentGroup>
-						<ContentGroup title="Admin panel" width="420" height="100">
-							<Admin />
-						</ContentGroup>
+						{user.role === 'admin' ? (
+							<ContentGroup title="Admin panel" width="420" height="100">
+								<Admin />
+							</ContentGroup>
+						) : (
+							<React.Fragment />
+						)}
 					</SiteNav>
 				</div>
 			</React.Fragment>
@@ -54,4 +61,7 @@ export class NavBar extends Component {
 	}
 }
 
-export default withRouter(NavBar);
+const mapStateToProps = (state) => ({
+	auth: state.auth
+});
+export default connect(mapStateToProps)(withRouter(NavBar));
