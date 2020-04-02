@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Fab, Action } from 'react-tiny-fab';
 import {
 	//Button,
 	//Jumbotron,
@@ -30,7 +31,8 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import BookHistory from './BookHistory';
 import Published from './Published';
-
+import { FiMapPin, FiNavigation2 } from 'react-icons/fi';
+import { TiHomeOutline } from 'react-icons/ti';
 import queryString from 'query-string';
 
 const MySwal = withReactContent(Swal);
@@ -226,10 +228,26 @@ export default class Profile extends Component {
 			rendered_action = <Published published_history={publishedHistory} />;
 		}
 		return (
-			<OutestContainer fluid>
-				<UserNavColumn2>{rendered_profile}</UserNavColumn2>
-				<ContentContainer fluid>{rendered_action}</ContentContainer>
-			</OutestContainer>
+			<React.Fragment>
+				<Fab
+					icon={<FiNavigation2 />}
+					mainButtonStyles={{ backgroundColor: '#ff0000' }}
+					position={{ top: 24, right: 24 }}
+				>
+					<Action
+						text="Back to home"
+						onClick={() => this.props.history.push('/home')}
+						style={{ backgroundColor: '#ed0c5e' }}
+					>
+						<TiHomeOutline />
+					</Action>
+				</Fab>
+
+				<OutestContainer fluid>
+					<UserNavColumn2>{rendered_profile}</UserNavColumn2>
+					<ContentContainer fluid>{rendered_action}</ContentContainer>
+				</OutestContainer>
+			</React.Fragment>
 		);
 	}
 }

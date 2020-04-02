@@ -19,6 +19,10 @@ import {
 } from 'react-bootstrap';
 import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
+
+import { Fab, Action } from 'react-tiny-fab';
+import { FiNavigation2 } from 'react-icons/fi';
+import { TiHomeOutline } from 'react-icons/ti';
 //
 // ─── STYLING ────────────────────────────────────────────────────────────────────
 //
@@ -412,244 +416,257 @@ export default class EditProfile extends Component {
 	render() {
 		const { currentAction, cachedCredential, credentials, makeAnyChanges, passwordCredential } = this.state;
 		return (
-			<MainContainer>
-				<Row style={{ textAlign: 'center' }}>
-					<Col md={12}>
-						<CustomUserImage
-							src={`/uploads/${cachedCredential.photo}`}
-							width="150"
-							height="150"
-							roundedCircle
-							onClick={() => this.onChangeImage()}
-						/>
-						<UserNameText>aaw0kenn</UserNameText>
-					</Col>
-				</Row>
-				<Row>
-					<Col md={3}>
-						<div>
-							<CustomUlHolder>
-								<CustomNavList
-									active={currentAction === 'profile' ? true : false}
-									onClick={() => this.onNavClicked('profile')}
-								>
-									Profile
-								</CustomNavList>
-								<CustomNavList
-									active={currentAction === 'editProfile' ? true : false}
-									onClick={() => this.onNavClicked('editProfile')}
-								>
-									Edit Profile
-								</CustomNavList>
-								<CustomNavList
-									active={currentAction === 'changePassword' ? true : false}
-									onClick={() => this.onNavClicked('changePassword')}
-								>
-									Change password
-								</CustomNavList>
-							</CustomUlHolder>
-						</div>
-					</Col>
-					<Col md={9}>
-						<p>My profile</p>
-						<ProfileBox>
-							{currentAction === 'editProfile' || currentAction === 'profile' ? (
-								<React.Fragment>
-									<CustomRow>
-										<LabelProfileInput md={3}>First Name</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												placeholder="Firstname"
-												disabled={currentAction === 'editProfile' ? false : true}
-												value={
-													currentAction === 'editProfile' ? (
-														credentials.firstName
-													) : (
-														cachedCredential.firstName
-													)
-												}
-												name="firstName"
-												onChange={this.inputHandler.bind(this)}
-											/>
-										</Col>
-									</CustomRow>
-									<CustomRow>
-										<LabelProfileInput md={3}>Last Name</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												placeholder="Lastname"
-												value={
-													currentAction === 'editProfile' ? (
-														credentials.lastName
-													) : (
-														cachedCredential.lastName
-													)
-												}
-												name="lastName"
-												onChange={this.inputHandler.bind(this)}
-												disabled={currentAction === 'editProfile' ? false : true}
-											/>
-										</Col>
-									</CustomRow>
-									<CustomRow>
-										<LabelProfileInput md={3}>Date of Birth</LabelProfileInput>
-										<Col md={9}>
-											<DatePicker
-												required
-												value={credentials.dateOfBirth}
-												onChange={(date) =>
-													this.setState((prevState) => ({
-														credentials: {
-															...prevState.credentials,
-															dateOfBirth: date
-														}
-													}))}
-												disabled={currentAction === 'editProfile' ? false : true}
-											/>
-										</Col>
-									</CustomRow>
-									<CustomRow>
-										<LabelProfileInput md={3}>Email Address</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												placeholder="Email"
-												value={
-													currentAction === 'editProfile' ? (
-														credentials.email
-													) : (
-														cachedCredential.email
-													)
-												}
-												name="email"
-												onChange={this.inputHandler.bind(this)}
-												disabled={currentAction === 'editProfile' ? false : true}
-											/>
-										</Col>
-									</CustomRow>
-									{currentAction === 'editProfile' && makeAnyChanges ? (
-										<React.Fragment>
-											<Animated
-												animationIn="fadeInLeft"
-												animationOut="fadeOutLeft"
-												animationInDuration={800}
-												animationOutDuration={800}
-												isVisible={currentAction === 'editProfile' && makeAnyChanges}
-											>
-												<CustomRow>
-													<Col md={12}>
-														<AwesomeButtonProgress
-															style={{ width: '100%' }}
-															type="secondary"
-															size="medium"
-															action={(element, next) =>
-																setTimeout(() => {
-																	this.onUpdateDetails(next);
-																}, 500)}
-															loadingLabel="Applying your changes , Please be patient . . ."
-															resultLabel="👍🏽"
-														>
-															Apply change
-														</AwesomeButtonProgress>
-													</Col>
-												</CustomRow>
-												<CustomRow>
-													<Col md={12}>
-														<CustomCancleButton type="reddit" size="medium">
-															Discard change
-														</CustomCancleButton>
-													</Col>
-												</CustomRow>
-											</Animated>
-										</React.Fragment>
-									) : null}
-								</React.Fragment>
-							) : (
-								<React.Fragment>
-									<CustomRow>
-										<LabelProfileInput md={3}>Current Password</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												type="password"
-												placeholder="Current Password"
-												value={passwordCredential.currentPassword}
-												name="currentPassword"
-												onChange={this.inputHandlerForPasswordCredentials.bind(this)}
-											/>
-										</Col>
-									</CustomRow>
-									<CustomRow>
-										<LabelProfileInput md={3}>New Password</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												type="password"
-												placeholder="New Password"
-												value={passwordCredential.newPassword}
-												name="newPassword"
-												onChange={this.inputHandlerForPasswordCredentials.bind(this)}
-											/>
-										</Col>
-									</CustomRow>
-									<CustomRow>
-										<LabelProfileInput md={3}>Confirm Password</LabelProfileInput>
-										<Col md={9}>
-											<Form.Control
-												type="password"
-												placeholder="Confirm New Password"
-												value={passwordCredential.newPassword2}
-												name="newPassword2"
-												onChange={this.inputHandlerForPasswordCredentials.bind(this)}
-												isInvalid={
-													passwordCredential.newPassword !== passwordCredential.newPassword2
-												}
-											/>
-										</Col>
-									</CustomRow>
-									{this.passwordChangeShouldProceed() ? (
-										<React.Fragment>
-											<Animated
-												animationIn="fadeInUp"
-												animationOut="fadeOutDown"
-												animationInDuration={800}
-												animationOutDuration={800}
-												isVisible={this.passwordChangeShouldProceed()}
-											>
-												<CustomRow>
-													<Col md={12}>
-														<AwesomeButtonProgress
-															style={{ width: '100%' }}
-															type="secondary"
-															size="medium"
-															action={(element, next) =>
-																setTimeout(() => {
-																	this.onChangePassword(next); // works because using arrow function => bind isn't needed
-																}, 500)}
-															loadingLabel="Applying your changes , Please be patient . . ."
-															resultLabel="👍🏽"
-														>
-															Apply change
-														</AwesomeButtonProgress>
-													</Col>
-												</CustomRow>
-												<CustomRow>
-													<Col md={12}>
-														<CustomCancleButton
-															type="reddit"
-															size="medium"
-															action={() => this.discardChanges()}
-														>
-															Discard change
-														</CustomCancleButton>
-													</Col>
-												</CustomRow>
-											</Animated>
-										</React.Fragment>
-									) : null}
-								</React.Fragment>
-							)}
-						</ProfileBox>
-					</Col>
-				</Row>
-			</MainContainer>
+			<React.Fragment>
+				<Fab icon={<FiNavigation2 />} mainButtonStyles={{ backgroundColor: '#ff0000' }}>
+					<Action
+						text="Back to home"
+						onClick={() => this.props.history.push('/home')}
+						style={{ backgroundColor: '#ed0c5e' }}
+					>
+						<TiHomeOutline />
+					</Action>
+				</Fab>
+
+				<MainContainer>
+					<Row style={{ textAlign: 'center' }}>
+						<Col md={12}>
+							<CustomUserImage
+								src={`/uploads/${cachedCredential.photo}`}
+								width="150"
+								height="150"
+								roundedCircle
+								onClick={() => this.onChangeImage()}
+							/>
+							<UserNameText>aaw0kenn</UserNameText>
+						</Col>
+					</Row>
+					<Row>
+						<Col md={3}>
+							<div>
+								<CustomUlHolder>
+									<CustomNavList
+										active={currentAction === 'profile' ? true : false}
+										onClick={() => this.onNavClicked('profile')}
+									>
+										Profile
+									</CustomNavList>
+									<CustomNavList
+										active={currentAction === 'editProfile' ? true : false}
+										onClick={() => this.onNavClicked('editProfile')}
+									>
+										Edit Profile
+									</CustomNavList>
+									<CustomNavList
+										active={currentAction === 'changePassword' ? true : false}
+										onClick={() => this.onNavClicked('changePassword')}
+									>
+										Change password
+									</CustomNavList>
+								</CustomUlHolder>
+							</div>
+						</Col>
+						<Col md={9}>
+							<p>My profile</p>
+							<ProfileBox>
+								{currentAction === 'editProfile' || currentAction === 'profile' ? (
+									<React.Fragment>
+										<CustomRow>
+											<LabelProfileInput md={3}>First Name</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													placeholder="Firstname"
+													disabled={currentAction === 'editProfile' ? false : true}
+													value={
+														currentAction === 'editProfile' ? (
+															credentials.firstName
+														) : (
+															cachedCredential.firstName
+														)
+													}
+													name="firstName"
+													onChange={this.inputHandler.bind(this)}
+												/>
+											</Col>
+										</CustomRow>
+										<CustomRow>
+											<LabelProfileInput md={3}>Last Name</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													placeholder="Lastname"
+													value={
+														currentAction === 'editProfile' ? (
+															credentials.lastName
+														) : (
+															cachedCredential.lastName
+														)
+													}
+													name="lastName"
+													onChange={this.inputHandler.bind(this)}
+													disabled={currentAction === 'editProfile' ? false : true}
+												/>
+											</Col>
+										</CustomRow>
+										<CustomRow>
+											<LabelProfileInput md={3}>Date of Birth</LabelProfileInput>
+											<Col md={9}>
+												<DatePicker
+													required
+													value={credentials.dateOfBirth}
+													onChange={(date) =>
+														this.setState((prevState) => ({
+															credentials: {
+																...prevState.credentials,
+																dateOfBirth: date
+															}
+														}))}
+													disabled={currentAction === 'editProfile' ? false : true}
+												/>
+											</Col>
+										</CustomRow>
+										<CustomRow>
+											<LabelProfileInput md={3}>Email Address</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													placeholder="Email"
+													value={
+														currentAction === 'editProfile' ? (
+															credentials.email
+														) : (
+															cachedCredential.email
+														)
+													}
+													name="email"
+													onChange={this.inputHandler.bind(this)}
+													disabled={currentAction === 'editProfile' ? false : true}
+												/>
+											</Col>
+										</CustomRow>
+										{currentAction === 'editProfile' && makeAnyChanges ? (
+											<React.Fragment>
+												<Animated
+													animationIn="fadeInLeft"
+													animationOut="fadeOutLeft"
+													animationInDuration={800}
+													animationOutDuration={800}
+													isVisible={currentAction === 'editProfile' && makeAnyChanges}
+												>
+													<CustomRow>
+														<Col md={12}>
+															<AwesomeButtonProgress
+																style={{ width: '100%' }}
+																type="secondary"
+																size="medium"
+																action={(element, next) =>
+																	setTimeout(() => {
+																		this.onUpdateDetails(next);
+																	}, 500)}
+																loadingLabel="Applying your changes , Please be patient . . ."
+																resultLabel="👍🏽"
+															>
+																Apply change
+															</AwesomeButtonProgress>
+														</Col>
+													</CustomRow>
+													<CustomRow>
+														<Col md={12}>
+															<CustomCancleButton type="reddit" size="medium">
+																Discard change
+															</CustomCancleButton>
+														</Col>
+													</CustomRow>
+												</Animated>
+											</React.Fragment>
+										) : null}
+									</React.Fragment>
+								) : (
+									<React.Fragment>
+										<CustomRow>
+											<LabelProfileInput md={3}>Current Password</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													type="password"
+													placeholder="Current Password"
+													value={passwordCredential.currentPassword}
+													name="currentPassword"
+													onChange={this.inputHandlerForPasswordCredentials.bind(this)}
+												/>
+											</Col>
+										</CustomRow>
+										<CustomRow>
+											<LabelProfileInput md={3}>New Password</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													type="password"
+													placeholder="New Password"
+													value={passwordCredential.newPassword}
+													name="newPassword"
+													onChange={this.inputHandlerForPasswordCredentials.bind(this)}
+												/>
+											</Col>
+										</CustomRow>
+										<CustomRow>
+											<LabelProfileInput md={3}>Confirm Password</LabelProfileInput>
+											<Col md={9}>
+												<Form.Control
+													type="password"
+													placeholder="Confirm New Password"
+													value={passwordCredential.newPassword2}
+													name="newPassword2"
+													onChange={this.inputHandlerForPasswordCredentials.bind(this)}
+													isInvalid={
+														passwordCredential.newPassword !==
+														passwordCredential.newPassword2
+													}
+												/>
+											</Col>
+										</CustomRow>
+										{this.passwordChangeShouldProceed() ? (
+											<React.Fragment>
+												<Animated
+													animationIn="fadeInUp"
+													animationOut="fadeOutDown"
+													animationInDuration={800}
+													animationOutDuration={800}
+													isVisible={this.passwordChangeShouldProceed()}
+												>
+													<CustomRow>
+														<Col md={12}>
+															<AwesomeButtonProgress
+																style={{ width: '100%' }}
+																type="secondary"
+																size="medium"
+																action={(element, next) =>
+																	setTimeout(() => {
+																		this.onChangePassword(next); // works because using arrow function => bind isn't needed
+																	}, 500)}
+																loadingLabel="Applying your changes , Please be patient . . ."
+																resultLabel="👍🏽"
+															>
+																Apply change
+															</AwesomeButtonProgress>
+														</Col>
+													</CustomRow>
+													<CustomRow>
+														<Col md={12}>
+															<CustomCancleButton
+																type="reddit"
+																size="medium"
+																action={() => this.discardChanges()}
+															>
+																Discard change
+															</CustomCancleButton>
+														</Col>
+													</CustomRow>
+												</Animated>
+											</React.Fragment>
+										) : null}
+									</React.Fragment>
+								)}
+							</ProfileBox>
+						</Col>
+					</Row>
+				</MainContainer>
+			</React.Fragment>
 		);
 	}
 }

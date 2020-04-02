@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+
+import { Fab, Action } from 'react-tiny-fab';
+import { FiNavigation2 } from 'react-icons/fi';
+import { TiHomeOutline } from 'react-icons/ti';
 import {
 	//Button,
 	//Jumbotron,
@@ -259,6 +263,20 @@ class Hostel extends Component {
 		}
 		return (
 			<React.Fragment>
+				<Fab
+					icon={<FiNavigation2 />}
+					mainButtonStyles={{ backgroundColor: '#ff0000' }}
+					position={{ top: 24, right: 24 }}
+				>
+					<Action
+						text="Back to home"
+						onClick={() => this.props.history.push('/home')}
+						style={{ backgroundColor: '#ed0c5e' }}
+					>
+						<TiHomeOutline />
+					</Action>
+				</Fab>
+
 				<Modal
 					show={isEditing}
 					size="lg"
