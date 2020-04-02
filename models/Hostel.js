@@ -63,10 +63,17 @@ const HostelSchema = new mongoose.Schema({
 	}
 });
 
-// Create bootcamp slug from the name
+// Create hostel slug from the name
 HostelSchema.pre('save', function(next) {
 	//console.log('Slugify ran', this.name);
 	this.slug = slugify(this.name, { lower: true });
+	next();
+});
+
+// Cascade delete booking and comments when a hostel is deleted
+HostelSchema.pre('remove', async function(next) {
+	await this.model('Comments').deleteMany({ hostel: this._id });
+	await this.model('Booking').deleteMany({ hostel: this._id });
 	next();
 });
 

@@ -404,8 +404,9 @@ exports.deleteHostel = asyncHandler(async (req, res, next) => {
 	}
 
 	const { hostelId } = req.params;
-	await Hostel.findByIdAndDelete(hostelId);
-
+	//await Hostel.findByIdAndDelete(hostelId);  // this will not trigger middleware
+	const hostel = await Hostel.findById(hostelId); // findByIdAndDelete not gonna triggered the middle ware
+	await hostel.remove(); // casecade delete all existing booking and comment
 	res.status(200).json({ success: true, data: {} });
 });
 // ────────────────────────────────────────────────────────────────────────────────
