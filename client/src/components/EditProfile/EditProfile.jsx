@@ -139,6 +139,7 @@ export default class EditProfile extends Component {
 	}
 
 	async componentDidMount() {
+		document.title = 'Edit Profile';
 		try {
 			const credential_request = await axios.get('/api/auth/mycredentials');
 			let _credentials = credential_request.data.data;

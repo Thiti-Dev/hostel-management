@@ -115,6 +115,7 @@ export default class Profile extends Component {
 			const profile_request = await axios.get(`/api/users/${username}`);
 			const profileData = profile_request.data.data;
 			this.setState({ profileData });
+			document.title = profileData.username + "'s profile";
 		} catch (error) {
 			console.log(error.response);
 			this.props.history.push('/404');

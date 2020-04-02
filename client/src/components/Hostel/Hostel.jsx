@@ -113,6 +113,7 @@ class Hostel extends Component {
 			//console.log(detail_request);
 			this.setState({ hostelDetail: detail_request.data.data, totalBooked: detail_request.data.total_booked });
 			this.fetchHostelComments(detail_request.data.data._id);
+			document.title = detail_request.data.data.name;
 		} catch (error) {
 			// Redirect to page not found
 			this.props.history.push('/404');

@@ -52,6 +52,9 @@ const Notice = styled.div`
 `;
 
 class PageNotFound extends Component {
+	componentDidMount() {
+		document.title = '404 page not found';
+	}
 	render() {
 		return (
 			<React.Fragment>

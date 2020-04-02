@@ -56,6 +56,9 @@ export default class CreateHostel extends Component {
 			shouldDeleteTerm: false
 		};
 	}
+	componentDidMount() {
+		document.title = 'Host a hostel';
+	}
 	setReady() {
 		// Programmatically smoothing
 		this.setState({ isReady: true });

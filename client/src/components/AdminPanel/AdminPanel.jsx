@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Fab, Action } from 'react-tiny-fab';
 import { FiNavigation2 } from 'react-icons/fi';
 import { TiHomeOutline } from 'react-icons/ti';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import {
 	//Button,
@@ -77,7 +78,7 @@ const CustomInformationBox = styled.div`
 	margin-top: 0.5rem;
 `;
 
-export default class VerifyPlace extends Component {
+class AdminPanel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -89,15 +90,20 @@ export default class VerifyPlace extends Component {
 	}
 
 	componentDidMount() {
-		axios
-			.get('/api/hostels')
-			.then((res) => {
-				console.log(res);
-				this.setState({ hostels: res.data.data });
-			})
-			.catch((err) => {
-				console.log(err.response.data);
-			});
+		if (this.props.auth.user.role != 'admin') {
+			this.props.history.push('401'); // un authorized
+		} else {
+			document.title = 'Admin Panel';
+			axios
+				.get('/api/hostels')
+				.then((res) => {
+					console.log(res);
+					this.setState({ hostels: res.data.data });
+				})
+				.catch((err) => {
+					console.log(err.response.data);
+				});
+		}
 	}
 
 	async onActionPanelShown(hostelId) {
@@ -313,3 +319,8 @@ export default class VerifyPlace extends Component {
 		);
 	}
 }
+
+const mapStateToProps = (state) => ({
+	auth: state.auth
+});
+export default connect(mapStateToProps)(AdminPanel);
