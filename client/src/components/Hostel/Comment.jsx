@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
 	//Button,
 	//Jumbotron,
@@ -129,7 +130,9 @@ export default class Comment extends Component {
 							</Col>
 							<Col md={{ span: 10, offset: 1 }} style={{ marginLeft: '1rem' }}>
 								<CustomUserNameText>
-									<span style={{ fontWeight: 'bolder' }}>@{comment.user.username}</span>
+									<Link style={{ color: 'black' }} to={`/user/${comment.user.username}`}>
+										<span style={{ fontWeight: 'bolder' }}>@{comment.user.username}</span>
+									</Link>
 									<span style={{ fontWeight: 'lighter' }}>
 										{'   '}
 										<Moment fromNow>{comment.createdAt}</Moment>
