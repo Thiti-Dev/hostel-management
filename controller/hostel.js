@@ -24,6 +24,9 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 					},
 					{
 						description: { $regex: '.*' + search + '.*', $options: 'i' }
+					},
+					{
+						address: { $regex: '.*' + search + '.*', $options: 'i' }
 					}
 				]
 			}).populate({
