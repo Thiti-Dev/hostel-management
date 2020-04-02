@@ -60,6 +60,11 @@ import PlaceLists from './PlaceLists';
 
 import Rating from 'react-rating';
 import NavBar from '../common/NavBar/NavBar';
+
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+const MySwal = withReactContent(Swal);
+
 const mainParallax =
 	'https://images.unsplash.com/photo-1527796261673-e9d61cc1e03c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
 
@@ -109,14 +114,28 @@ class Home extends React.Component {
 	}
 
 	async findPlace() {
+		const { searchStr } = this.state;
 		try {
-			const fetched_hostel = await axios.get('/api/hostels/');
+			let rendered_url = searchStr.length <= 0 ? '/api/hostels' : `/api/hostels?search=${searchStr}`;
+			const fetched_hostel = await axios.get(rendered_url);
 			this.setState({ placesData: fetched_hostel.data.data });
 			this.props.setCurrentSearchData({
 				startDate: this.state.startDate,
 				endDate: this.state.endDate,
 				totalGuest: this.state.totalGuest
 			});
+			if (fetched_hostel.data.data.length <= 0) {
+				// not fonud any
+				MySwal.fire({
+					position: 'center',
+					icon: 'error',
+					title: `No hostel matched with ${searchStr}`,
+					showConfirmButton: false,
+					timer: 1500,
+					timerProgressBar: true,
+					backdrop: false
+				});
+			}
 		} catch (err) {}
 	}
 
