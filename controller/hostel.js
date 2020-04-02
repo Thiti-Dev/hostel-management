@@ -343,3 +343,69 @@ exports.uploadHostelPhoto = asyncHandler(async (req, res, next) => {
 		res.status(200).json({ success: true, data: file.name });
 	});
 });
+
+//
+// ─── ADMIN ──────────────────────────────────────────────────────────────────────
+//
+// @desc    Verify a hostel
+// @route   GET /api/hostels/:hostelId/verify
+// @acess   Admin
+exports.verifyHostel = asyncHandler(async (req, res, next) => {
+	// Make sure user is the hostel's owner
+
+	if (req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this hostel`, 401));
+	}
+
+	const { hostelId } = req.params;
+	const verify = await Hostel.findByIdAndUpdate(
+		hostelId,
+		{ validated: true },
+		{
+			new: true, // returning the document after update applied
+			runValidators: true // run validator
+		}
+	);
+
+	res.status(200).json({ success: true });
+});
+
+// @desc    De-Verify a hostel
+// @route   GET /api/hostels/:hostelId/unverify
+// @acess   Admin
+exports.unVerifyHostel = asyncHandler(async (req, res, next) => {
+	// Make sure user is the hostel's owner
+
+	if (req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this hostel`, 401));
+	}
+
+	const { hostelId } = req.params;
+	const verify = await Hostel.findByIdAndUpdate(
+		hostelId,
+		{ validated: false },
+		{
+			new: true, // returning the document after update applied
+			runValidators: true // run validator
+		}
+	);
+
+	res.status(200).json({ success: true });
+});
+
+// @desc    Delete a hostel
+// @route   DELETE /api/hostels/:hostelId
+// @acess   Admin
+exports.deleteHostel = asyncHandler(async (req, res, next) => {
+	// Make sure user is the hostel's owner
+
+	if (req.user.role !== 'admin') {
+		return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this hostel`, 401));
+	}
+
+	const { hostelId } = req.params;
+	await Hostel.findByIdAndDelete(hostelId);
+
+	res.status(200).json({ success: true, data: {} });
+});
+// ────────────────────────────────────────────────────────────────────────────────
