@@ -194,7 +194,7 @@ function Login(props) {
 							loadingLabel="Logging In , Please be patient . . ."
 							resultLabel="👍🏽"
 						>
-							Back to home page
+							Take me back
 						</AwesomeButton>
 					</Form>
 					<CustomErrorFeedback>{errorMsg ? errorMsg : null}</CustomErrorFeedback>
