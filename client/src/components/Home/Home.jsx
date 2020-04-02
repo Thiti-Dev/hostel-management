@@ -131,8 +131,7 @@ class Home extends React.Component {
 					<Action
 						style={{
 							backgroundColor: '#89db42',
-							backgroundImage:
-								"url('https://avatars1.githubusercontent.com/u/36455825?s=460&u=7d01e09a590eba9ac70883c31990afeaf30d4b95&v=4')",
+							backgroundImage: `url('/uploads/${this.props.auth.user.photo}')`,
 							backgroundPosition: 'center',
 							backgroundSize: 'contain'
 						}}
