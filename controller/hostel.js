@@ -14,14 +14,37 @@ exports.getAllHostel = asyncHandler(async (req, res, next) => {
 
 	// If just fetching in the home-page => which means no username params given from the url
 	if (!username) {
-		const hostels = await Hostel.find().populate({
-			path: 'owner',
-			select: 'username'
-		});
-		res.status(200).json({
-			success: true,
-			data: hostels
-		});
+		if (req.query.search) {
+			const { search } = req.query;
+			console.log(search);
+			const searched_hostel = await Hostel.find({
+				$or: [
+					{
+						name: { $regex: '.*' + search + '.*', $options: 'i' }
+					},
+					{
+						description: { $regex: '.*' + search + '.*', $options: 'i' }
+					}
+				]
+			}).populate({
+				path: 'owner',
+				select: 'username'
+			});
+			res.status(200).json({
+				success: true,
+				data: searched_hostel
+			});
+		} else {
+			// If user dont provide any search
+			const hostels = await Hostel.find().populate({
+				path: 'owner',
+				select: 'username'
+			});
+			res.status(200).json({
+				success: true,
+				data: hostels
+			});
+		}
 	} else {
 		//Else if trying to view others people published hostel
 
