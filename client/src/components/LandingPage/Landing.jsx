@@ -178,10 +178,34 @@ function Landing(props) {
 	const [ statisticData, setStatisticData ] = useState(null);
 
 	useEffect(() => {
+		Events.scrollEvent.register('begin', function(to, element) {
+			console.log('begin', arguments);
+		});
+
+		Events.scrollEvent.register('end', function(to, element) {
+			console.log('end', arguments);
+		});
+		scrollSpy.update();
+		return () => {
+			Events.scrollEvent.remove('begin');
+			Events.scrollEvent.remove('end');
+		};
+	});
+
+	useEffect(() => {
 		if (_authState.isAuthenticated) {
 			props.history.push('/home');
 		}
 	}, []);
+
+	const scrollTo = (section) => {
+		// Rendering dynamic calls
+		scroller.scrollTo(section, {
+			duration: 1500,
+			delay: 0,
+			smooth: 'easeInOutQuart'
+		});
+	};
 
 	const fetchStatistic = async () => {
 		try {
@@ -200,20 +224,7 @@ function Landing(props) {
 	}, []);
 
 	const [ shouldStartCountUp, startCountUp ] = useState(false);
-	const [ scrollPosition, setSrollPosition ] = useState(0);
-	const handleScroll = () => {
-		const position = window.pageYOffset;
-		setSrollPosition(position);
-		console.log(position);
-	};
 
-	// useEffect(() => {
-	// 	window.addEventListener('scroll', handleScroll, { passive: true });
-
-	// 	return () => {
-	// 		window.removeEventListener('scroll', handleScroll);
-	// 	};
-	// }, []);
 	const jumpToPage = (routeStr) => {
 		props.history.push(routeStr);
 	};
@@ -239,9 +250,8 @@ function Landing(props) {
 			</Parallax> */}
 			<TransNav>
 				<MenuContainer>
-					<ButtonInNav>About</ButtonInNav>
-					<ButtonInNav>Hostels</ButtonInNav>
-					<ButtonInNav>Sign up</ButtonInNav>
+					<ButtonInNav onClick={() => scrollTo('about')}>About</ButtonInNav>
+					<ButtonInNav onClick={() => scrollTo('register')}>Sign up</ButtonInNav>
 					<ButtonInNav onClick={() => jumpToPage('/login')}>Sign in</ButtonInNav>
 				</MenuContainer>
 			</TransNav>
@@ -255,14 +265,16 @@ function Landing(props) {
 				<CenterText>You've been walking too long, we have the places for you to take a rest</CenterText>
 			</Parallax>
 			<ScrollDown>︾</ScrollDown>
-			<CustomSection>
-				<span>About</span>
-				<UnderlineCenter />
-				<p style={{ textAlign: 'left', fontSize: '0.8rem', marginTop: '3rem' }}>
-					This is the website that provides you the lists of hostel that is registered and giving the
-					opportunity for you to whether booking or exploring the places around the world
-				</p>
-			</CustomSection>
+			<Element name="about" className="element">
+				<CustomSection>
+					<span>About</span>
+					<UnderlineCenter />
+					<p style={{ textAlign: 'left', fontSize: '0.8rem', marginTop: '3rem' }}>
+						This is the website that provides you the lists of hostel that is registered and giving the
+						opportunity for you to whether booking or exploring the places around the world
+					</p>
+				</CustomSection>
+			</Element>
 			<CustomSection>
 				<span>Statistic</span>
 				<UnderlineCenter />
@@ -298,7 +310,9 @@ function Landing(props) {
 			</CustomSection>
 			<SectionSeparator />
 
-			<Register history={props.history} />
+			<Element name="register" className="element">
+				<Register history={props.history} />
+			</Element>
 		</Container>
 	);
 }
