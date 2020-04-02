@@ -58,7 +58,7 @@ export default () => {
 					</ListItemContent>
 				</li>
 				<li>
-					<Link style={{ color: 'inherit', textDecoration: 'inherit' }} to={`/hostel/create`}>
+					<Link style={{ color: 'inherit', textDecoration: 'inherit' }} to={`/create/hostel`}>
 						<ListItemContent>
 							<img src={add} width={48} height={48} />
 							<LisItemHeadingText>
