@@ -44,13 +44,15 @@ export default () => {
 		<ListContainer>
 			<List>
 				<li>
-					<ListItemContent>
-						<img src={verify} width={48} height={48} />
-						<LisItemHeadingText>
-							<ListItemHeading>Verify</ListItemHeading>
-							<div>See the un-verified place, and verify it!.</div>
-						</LisItemHeadingText>
-					</ListItemContent>
+					<Link style={{ color: 'inherit', textDecoration: 'inherit' }} to="/admin">
+						<ListItemContent>
+							<img src={verify} width={48} height={48} />
+							<LisItemHeadingText>
+								<ListItemHeading>Verify&Manage</ListItemHeading>
+								<div>Verify or delete a hostel in Admin-Panel</div>
+							</LisItemHeadingText>
+						</ListItemContent>
+					</Link>
 				</li>
 			</List>
 		</ListContainer>

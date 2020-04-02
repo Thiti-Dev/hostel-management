@@ -29,7 +29,7 @@ import EditProfile from './components/EditProfile';
 import CreateHostel from './components/CreateHostel';
 import Profile from './components/Profile';
 import Hostel from './components/Hostel';
-import VerifyPlace from './components/VerifyPlace';
+import AdminPanel from './components/AdminPanel';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
@@ -71,7 +71,7 @@ class App extends React.Component {
 						<PrivateRoute exact path="/create/hostel" component={CreateHostel} />
 						<PrivateRoute exact path="/user/:username" component={Profile} />
 						<PrivateRoute exact path="/hostel/:hostelSlug" component={Hostel} />
-						<PrivateRoute exact path="/admin/verify" component={VerifyPlace} />
+						<PrivateRoute exact path="/admin" component={AdminPanel} />
 					</Switch>
 				</Router>
 			</Provider>
