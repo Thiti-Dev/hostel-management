@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Fab, Action } from 'react-tiny-fab';
+import { FiNavigation2 } from 'react-icons/fi';
+import { TiHomeOutline } from 'react-icons/ti';
 import axios from 'axios';
 import {
 	//Button,
@@ -282,6 +285,15 @@ export default class VerifyPlace extends Component {
 
 		return (
 			<React.Fragment>
+				<Fab icon={<FiNavigation2 />} mainButtonStyles={{ backgroundColor: '#ff0000' }}>
+					<Action
+						text="Back to home"
+						onClick={() => this.props.history.push('/home')}
+						style={{ backgroundColor: '#ed0c5e' }}
+					>
+						<TiHomeOutline />
+					</Action>
+				</Fab>
 				<MainContainer fluid>
 					<Nav variant="tabs" defaultActiveKey="all" style={{ marginBottom: '1rem' }}>
 						<Nav.Item>
