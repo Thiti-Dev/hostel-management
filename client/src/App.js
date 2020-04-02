@@ -31,6 +31,7 @@ import Profile from './components/Profile';
 import Hostel from './components/Hostel';
 import AdminPanel from './components/AdminPanel';
 import PageNotFound from './components/PageNotFound';
+import UnAuthorized from './components/UnAuthorized';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
@@ -67,6 +68,7 @@ class App extends React.Component {
 					<Switch>
 						<Route exact path="/" component={Landing} />
 						<Route exact path="/login" component={Login} />
+						<Route exact path="/401" component={UnAuthorized} />
 						<PrivateRoute exact path="/home" component={Home} />
 						<PrivateRoute exact path="/profile/edit" component={EditProfile} />
 						<PrivateRoute exact path="/create/hostel" component={CreateHostel} />
