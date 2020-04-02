@@ -5,7 +5,8 @@ const {
 	createHostel,
 	uploadHostelPhoto,
 	getCapacityBetweenDate,
-	getHostelDetailFromSlug
+	getHostelDetailFromSlug,
+	updateDetails
 } = require('../../controller/hostel');
 const { protect } = require('../../middleware/auth');
 
@@ -19,6 +20,7 @@ router.use('/:hostelId/comments', commentsRouter);
 router.route('/').get(getAllHostel).post(protect, createHostel);
 router.route('/:slug').get(getHostelDetailFromSlug);
 router.route('/:hostelId/getCapacity').get(protect, getCapacityBetweenDate);
+router.route('/:hostelId/updatedetails').put(protect, updateDetails);
 router.route('/:id/photo').put(protect, uploadHostelPhoto);
 
 module.exports = router;

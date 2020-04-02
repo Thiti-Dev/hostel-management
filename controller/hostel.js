@@ -128,6 +128,75 @@ exports.createHostel = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// @desc    Update hostel details / picture if included
+// @route   PUT /api/hostels/:hostelId/updatedetails
+// @acess   Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+	const { hostelId } = req.params;
+	// specific the field => protected from eding
+	// If more field to prevent => later will be store the blacklist in the array and then map
+	if (req.body._id) delete req.body['_id'];
+	if (req.body.createdAt) delete req.body['createdAt'];
+	if (req.body.validated) delete req.body['validated'];
+	if (req.body.validatedAt) delete req.body['validatedAt'];
+	if (req.body.owner) delete req.body['owner'];
+	if (req.body.photo) delete req.body['photo'];
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	const hostel_exist_data = await Hostel.findById(hostelId);
+
+	if (!hostel_exist_data) {
+		return next(new ErrorResponse(`Hostel with id ${hostelId} is not exist`, 404));
+	}
+
+	//@TODO check if user is the owner [EASY , later]
+	//DONE [ CODE BELOW ]
+
+	if (hostel_exist_data.owner.toString() !== req.user.id) {
+		return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this hostel`, 401));
+	}
+
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	if (req.files) {
+		const file = req.files.file;
+		//if photo is attached
+		// Make sure the image is a photo
+		if (!file.mimetype.startsWith('image')) {
+			return next(new ErrorResponse(`Please upload an image file`, 400));
+		}
+
+		// Check filesize
+		if (file.size > process.env.MAX_FILE_UPLOAD) {
+			return next(
+				new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400)
+			);
+		}
+
+		// Create custom filename
+		file.name = `photo_${hostel_exist_data._id}${path.parse(file.name).ext}`;
+		req.body.photo = file.name;
+		file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+			if (err) {
+				// This shouldn't happen
+				return next(new ErrorResponse(`Problem with file upload`, 500));
+			}
+		});
+	}
+
+	console.log(req.body);
+
+	const hostel = await Hostel.findByIdAndUpdate(hostelId, req.body, {
+		new: true, // returning the document after update applied
+		runValidators: true // run validator
+	});
+
+	res.status(200).json({
+		success: true,
+		data: hostel
+	});
+});
+
 // @desc    Get the capacity free between date / also give a total booking atm
 // @route   GET /api/hostels/:hostelId/getCapacity
 // @acess   Private
