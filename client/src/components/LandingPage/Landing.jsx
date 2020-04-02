@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import {
 	//Button,
 	//Jumbotron,
@@ -173,7 +174,14 @@ const bgLanding =
 	'https://images.pexels.com/photos/860562/pexels-photo-860562.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940';
 
 function Landing(props) {
+	const _authState = useSelector((state) => state.auth);
 	const [ statisticData, setStatisticData ] = useState(null);
+
+	useEffect(() => {
+		if (_authState.isAuthenticated) {
+			props.history.push('/home');
+		}
+	}, []);
 
 	const fetchStatistic = async () => {
 		try {
