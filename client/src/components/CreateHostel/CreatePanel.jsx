@@ -52,9 +52,7 @@ const text_truncate = function(str, length, ending) {
 
 export default function CreatePanel({ history }) {
 	const _authState = useSelector((state) => state.auth);
-	const [ previewImg, setPreviewImg ] = useState(
-		'https://q-cf.bstatic.com/images/hotel/max1024x768/204/204628111.jpg'
-	);
+	const [ previewImg, setPreviewImg ] = useState('https://erp.mju.ac.th/images/untitled.png');
 	const [ hostelDetails, setHostelDetails ] = useState({
 		photo: undefined,
 		name: '',
