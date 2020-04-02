@@ -31,3 +31,23 @@ exports.commentHostel = asyncHandler(async (req, res, next) => {
 		data: comment
 	});
 });
+
+// @desc    Get a comment of the given hostel
+// @route   GET /api/hostels/:hostelId/comments
+// @acess   Public
+exports.getHostelComments = asyncHandler(async (req, res, next) => {
+	const { hostelId } = req.params;
+
+	const hostel = await Hostel.findById(hostelId);
+
+	if (!hostel) {
+		return next(new ErrorResponse(`The hostel with id ${hostelId} is not exist`, 404));
+	}
+
+	const comment = await Comment.find({ hostel: hostelId });
+
+	res.status(200).json({
+		sucess: true,
+		data: comment
+	});
+});
