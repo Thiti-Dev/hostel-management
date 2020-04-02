@@ -8,9 +8,10 @@ const sendTokenResponse = (user, statusCode, res) => {
 		httpOnly: false // Will accessing this cookie in react ( avoiding using localstorage atm ) // will be patching for security later on
 	};
 
-	if (process.env.NODE_ENV === 'production') {
-		options.secure = true;
-	}
+	// @TODO doing the XSS protection later
+	// if (process.env.NODE_ENV === 'production') {
+	// 	options.secure = true;
+	// }
 
 	res.status(statusCode).cookie('token', token, options).json({
 		success: true,
