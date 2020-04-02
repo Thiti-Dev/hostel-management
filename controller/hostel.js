@@ -358,6 +358,11 @@ exports.verifyHostel = asyncHandler(async (req, res, next) => {
 	}
 
 	const { hostelId } = req.params;
+
+	if (!await Hostel.findById(hostelId)) {
+		return next(new ErrorResponse(`Hostel ID: ${req.user.id} is not exist`, 404));
+	}
+
 	const verify = await Hostel.findByIdAndUpdate(
 		hostelId,
 		{ validated: true },
@@ -381,6 +386,9 @@ exports.unVerifyHostel = asyncHandler(async (req, res, next) => {
 	}
 
 	const { hostelId } = req.params;
+	if (!await Hostel.findById(hostelId)) {
+		return next(new ErrorResponse(`Hostel ID: ${req.user.id} is not exist`, 404));
+	}
 	const verify = await Hostel.findByIdAndUpdate(
 		hostelId,
 		{ validated: false },
@@ -404,6 +412,11 @@ exports.deleteHostel = asyncHandler(async (req, res, next) => {
 	}
 
 	const { hostelId } = req.params;
+
+	if (!await Hostel.findById(hostelId)) {
+		return next(new ErrorResponse(`Hostel ID: ${req.user.id} is not exist`, 404));
+	}
+
 	//await Hostel.findByIdAndDelete(hostelId);  // this will not trigger middleware
 	const hostel = await Hostel.findById(hostelId); // findByIdAndDelete not gonna triggered the middle ware
 	await hostel.remove(); // casecade delete all existing booking and comment
