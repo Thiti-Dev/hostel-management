@@ -88,7 +88,8 @@ export default class Hostel extends Component {
 		this.state = {
 			currentAction: 'details',
 			hostelDetail: null,
-			totalBooked: 0
+			totalBooked: 0,
+			hostelComments: null
 		};
 	}
 	onChangeAction(action) {
@@ -99,11 +100,36 @@ export default class Hostel extends Component {
 	async fetchHostelData(slug) {
 		try {
 			const detail_request = await axios.get(`/api/hostels/${slug}`);
-			console.log(detail_request);
+			//console.log(detail_request);
 			this.setState({ hostelDetail: detail_request.data.data, totalBooked: detail_request.data.total_booked });
+			this.fetchHostelComments(detail_request.data.data._id);
 		} catch (error) {
 			// Redirect to page not found
 		}
+	}
+
+	async fetchHostelComments(hostelId) {
+		try {
+			const comments_request = await axios.get(`/api/hostels/${hostelId}/comments`);
+			console.log(comments_request);
+			this.setState({ hostelComments: comments_request.data.data });
+		} catch (error) {
+			// Redirect to page not found
+		}
+	}
+
+	onCommentSuccess(msg, userData) {
+		const appended_msg = {
+			user: {
+				username: userData.username,
+				photo: userData.photo
+			},
+			message: msg,
+			createdAt: new Date(Date.now())
+		};
+		this.setState({
+			hostelComments: [ appended_msg, ...this.state.hostelComments ]
+		});
 	}
 
 	componentDidMount() {
@@ -111,7 +137,7 @@ export default class Hostel extends Component {
 		this.fetchHostelData(this.props.match.params.hostelSlug);
 	}
 	render() {
-		const { currentAction, hostelDetail, totalBooked } = this.state;
+		const { currentAction, hostelDetail, totalBooked, hostelComments } = this.state;
 		let rendered_content;
 		if (currentAction === 'details') {
 			if (!hostelDetail) {
@@ -140,7 +166,13 @@ export default class Hostel extends Component {
 				);
 			}
 		} else {
-			rendered_content = <Comment />;
+			rendered_content = (
+				<Comment
+					comments_data={hostelComments}
+					hostelId={hostelDetail._id}
+					on_success={this.onCommentSuccess.bind(this)}
+				/>
+			);
 		}
 		let rendered_hostel_detail;
 		if (!hostelDetail) {
@@ -205,7 +237,7 @@ export default class Hostel extends Component {
 							</Nav.Item>
 							<Nav.Item>
 								<Nav.Link eventKey="comment" onClick={() => this.onChangeAction('comment')}>
-									Comments
+									Comments<Badge variant="light">{hostelComments ? hostelComments.length : 0}</Badge>
 								</Nav.Link>
 							</Nav.Item>
 						</Nav>

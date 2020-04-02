@@ -20,6 +20,7 @@ import {
 } from 'react-bootstrap';
 import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
+import Moment from 'react-moment';
 //
 // ─── STYLING ────────────────────────────────────────────────────────────────────
 //
@@ -95,43 +96,57 @@ export default class Comment extends Component {
 		let value = event.target.value;
 		this.setState({ [key]: value });
 	}
+	async onCommentHandler(next) {
+		const { comment_text } = this.state;
+		const { hostelId, on_success } = this.props;
+		if (comment_text.length > 0) {
+			try {
+				const comment = await axios.post(`/api/hostels/${hostelId}/comments`, { message: comment_text });
+
+				this.setState({ comment_text: '' }); // empty the comment text
+				next();
+
+				const current_user_data = comment.data.data.user;
+				on_success(comment_text, current_user_data); // calling a callback to shift the message to an array
+			} catch (error) {}
+		} else {
+			next(false, 'No message provided');
+		}
+	}
+
 	render() {
 		let { comment_text } = this.state;
+		const { comments_data } = this.props;
+		let rendered_comments;
+
+		if (!comments_data) {
+			rendered_comments = <Spinner style={{ textAlign: 'center' }} animation="border" variant="secondary" />;
+		} else {
+			rendered_comments = comments_data.map((comment, key) => {
+				return (
+					<React.Fragment key={key}>
+						<CommentRow>
+							<Col md={1}>
+								<Image src={`/uploads/${comment.user.photo}`} height="80" width="80" align="middle" />
+							</Col>
+							<Col md={{ span: 10, offset: 1 }} style={{ marginLeft: '1rem' }}>
+								<CustomUserNameText>
+									<span style={{ fontWeight: 'bolder' }}>@{comment.user.username}</span>
+									<span style={{ fontWeight: 'lighter' }}>
+										{'   '}
+										<Moment fromNow>{comment.createdAt}</Moment>
+									</span>
+								</CustomUserNameText>
+								{comment.message}
+							</Col>
+						</CommentRow>
+					</React.Fragment>
+				);
+			});
+		}
 		return (
 			<React.Fragment>
-				<HistoryHolderContainer>
-					<CommentRow>
-						<Col md={1}>
-							<Image
-								src="https://axneveshteh.ir/wp-content/uploads/2020/01/%D8%B9%DA%A9%D8%B3-%D9%BE%D8%B1%D9%88%D9%81%D8%A7%DB%8C%D9%84-%D9%87%D9%86%D8%B1%DB%8C-%D8%AF%D8%AE%D8%AA%D8%B1%D9%88%D9%86%D9%87-%D8%A7%DB%8C%D9%86%D8%B3%D8%AA%D8%A7%DA%AF%D8%B1%D8%A7%D9%85-29.jpg"
-								height="80"
-								width="80"
-								align="middle"
-							/>
-						</Col>
-						<Col md={{ span: 10, offset: 1 }} style={{ marginLeft: '1rem' }}>
-							<CustomUserNameText>
-								<span style={{ fontWeight: 'bolder' }}>@aaw0kenn</span>
-								<span style={{ fontWeight: 'lighter' }}>{'   '}6 minutes ago</span>
-							</CustomUserNameText>
-							A good place to go with friend!
-						</Col>
-					</CommentRow>
-					<CommentRow>
-						<Col md={1}>
-							<Image
-								src="https://axneveshteh.ir/wp-content/uploads/2020/01/%D8%B9%DA%A9%D8%B3-%D9%BE%D8%B1%D9%88%D9%81%D8%A7%DB%8C%D9%84-%D9%87%D9%86%D8%B1%DB%8C-%D8%AF%D8%AE%D8%AA%D8%B1%D9%88%D9%86%D9%87-%D8%A7%DB%8C%D9%86%D8%B3%D8%AA%D8%A7%DA%AF%D8%B1%D8%A7%D9%85-29.jpg"
-								height="80"
-								width="80"
-								align="middle"
-							/>
-						</Col>
-						<Col md={{ span: 10, offset: 1 }} style={{ marginLeft: '1rem' }}>
-							<CustomUserNameText>@aaw0kenn</CustomUserNameText>
-							A good place to go with friend!
-						</Col>
-					</CommentRow>
-				</HistoryHolderContainer>
+				<HistoryHolderContainer>{rendered_comments}</HistoryHolderContainer>
 				<CustomCommentGuide>Add your comment</CustomCommentGuide>
 				<Form.Control
 					name="comment_text"
@@ -147,7 +162,7 @@ export default class Comment extends Component {
 					action={(element, next) =>
 						setTimeout(() => {
 							//awesome_button_middleware = next;
-							next();
+							this.onCommentHandler(next);
 						}, 500)}
 					loadingLabel="Commenting . . ."
 					resultLabel="👍🏽"
