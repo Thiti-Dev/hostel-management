@@ -271,7 +271,8 @@ function Landing(props) {
 					<UnderlineCenter />
 					<p style={{ textAlign: 'left', fontSize: '0.8rem', marginTop: '3rem' }}>
 						This is the website that provides you the lists of hostel that is registered and giving the
-						opportunity for you to whether booking or exploring the places around the world
+						opportunity for you to whether booking or exploring the places around the world. You also can
+						become a partner by hosting your own place and serve the best to all of the member
 					</p>
 				</CustomSection>
 			</Element>
