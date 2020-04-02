@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
 	//Button,
 	//Jumbotron,
@@ -114,9 +115,11 @@ export default class Published extends Component {
 								src={`/uploads/${hostel.photo}`}
 							/>
 							<Card.Body>
-								<Card.Title>
-									<PublishedHostelName>{hostel.name}</PublishedHostelName>
-								</Card.Title>
+								<Link to={`/hostel/${hostel.slug}`}>
+									<Card.Title>
+										<PublishedHostelName>{hostel.name}</PublishedHostelName>
+									</Card.Title>
+								</Link>
 								<Card.Text>{hostel.description}</Card.Text>
 							</Card.Body>
 							<Card.Footer>
