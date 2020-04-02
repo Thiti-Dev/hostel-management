@@ -30,6 +30,7 @@ import CreateHostel from './components/CreateHostel';
 import Profile from './components/Profile';
 import Hostel from './components/Hostel';
 import AdminPanel from './components/AdminPanel';
+import PageNotFound from './components/PageNotFound';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
@@ -72,6 +73,7 @@ class App extends React.Component {
 						<PrivateRoute exact path="/user/:username" component={Profile} />
 						<PrivateRoute exact path="/hostel/:hostelSlug" component={Hostel} />
 						<PrivateRoute exact path="/admin" component={AdminPanel} />
+						<Route exact path="*" component={PageNotFound} />
 					</Switch>
 				</Router>
 			</Provider>
