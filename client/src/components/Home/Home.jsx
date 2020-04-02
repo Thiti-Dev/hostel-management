@@ -100,6 +100,8 @@ class Home extends React.Component {
 			placesData: [],
 			searchStr: ''
 		};
+		this.onSetStartDate = this.onSetStartDate.bind(this);
+		this.onSetEndDate = this.onSetEndDate.bind(this);
 	}
 
 	componentDidMount() {
@@ -121,6 +123,29 @@ class Home extends React.Component {
 	goToMyProfile() {
 		this.props.history.push(`/user/${this.props.auth.user.username}`);
 	}
+
+	onSetStartDate(date) {
+		const { endDate } = this.state;
+		if (date >= endDate) {
+			const tomorrowOfNewDate = new Date(date);
+			tomorrowOfNewDate.setDate(tomorrowOfNewDate.getDate() + 1);
+			this.setState({ startDate: date, endDate: tomorrowOfNewDate });
+		} else {
+			this.setState({ startDate: date });
+		}
+	}
+
+	onSetEndDate(date) {
+		const { startDate } = this.state;
+		if (date <= startDate) {
+			const yesterdayOfNewDate = new Date(date);
+			yesterdayOfNewDate.setDate(yesterdayOfNewDate.getDate() - 1);
+			this.setState({ startDate: yesterdayOfNewDate, endDate: date });
+		} else {
+			this.setState({ endDate: date });
+		}
+	}
+
 	render() {
 		let { startDate, endDate, totalGuest, searchStr } = this.state;
 		return (
@@ -177,7 +202,7 @@ class Home extends React.Component {
 											<DatePicker
 												style={{ marginLeft: 5 }}
 												value={startDate}
-												onChange={(date) => this.setState({ startDate: date })}
+												onChange={this.onSetStartDate}
 											/>
 										</InputGroup>
 									</Form.Group>
@@ -192,7 +217,7 @@ class Home extends React.Component {
 											<DatePicker
 												style={{ marginLeft: 5, zIndex: '999' }}
 												value={endDate}
-												onChange={(date) => this.setState({ endDate: date })}
+												onChange={this.onSetEndDate}
 											/>
 										</InputGroup>
 									</Form.Group>
