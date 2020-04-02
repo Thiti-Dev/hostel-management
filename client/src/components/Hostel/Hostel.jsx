@@ -115,6 +115,7 @@ class Hostel extends Component {
 			this.fetchHostelComments(detail_request.data.data._id);
 		} catch (error) {
 			// Redirect to page not found
+			this.props.history.push('/404');
 		}
 	}
 
@@ -125,6 +126,7 @@ class Hostel extends Component {
 			this.setState({ hostelComments: comments_request.data.data });
 		} catch (error) {
 			// Redirect to page not found
+			this.props.history.push('/404');
 		}
 	}
 

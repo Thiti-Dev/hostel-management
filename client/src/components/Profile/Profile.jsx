@@ -117,6 +117,7 @@ export default class Profile extends Component {
 			this.setState({ profileData });
 		} catch (error) {
 			console.log(error.response);
+			this.props.history.push('/404');
 		}
 	}
 
