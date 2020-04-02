@@ -46,6 +46,7 @@ import { MdMoveToInbox, MdUpdate, MdPersonOutline } from 'react-icons/md';
 import { FiBox, FiPhone } from 'react-icons/fi';
 import { GoLocation } from 'react-icons/go';
 import { AiOutlineMail } from 'react-icons/ai';
+import { TiZoomOutline } from 'react-icons/ti';
 import queryString from 'query-string';
 import Comment from './Comment';
 import * as Func from '../../utils/Functions';
@@ -165,6 +166,14 @@ class Hostel extends Component {
 				rendered_content = (
 					<React.Fragment>
 						<p style={{ padding: '1rem', marginTop: '1rem' }}>
+							<TiZoomOutline />{' '}
+							{hostelDetail.validated ? (
+								<Badge variant="success">Verified</Badge>
+							) : (
+								<Badge variant="danger">Un-verified</Badge>
+							)}
+							<br />
+							<br />
 							<IoIosInformationCircleOutline /> {hostelDetail.description}
 							<br />
 							<br />
