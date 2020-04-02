@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import {
 	//Button,
 	//Jumbotron,
@@ -82,7 +83,7 @@ const CustomUserNameLabel = styled.p`
 	/* white-space: nowrap; */
 `;
 
-export default class Hostel extends Component {
+class Hostel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -118,11 +119,11 @@ export default class Hostel extends Component {
 		}
 	}
 
-	onCommentSuccess(msg, userData) {
+	onCommentSuccess(msg) {
 		const appended_msg = {
 			user: {
-				username: userData.username,
-				photo: userData.photo
+				username: this.props.auth.user.username,
+				photo: this.props.auth.user.photo
 			},
 			message: msg,
 			createdAt: new Date(Date.now())
@@ -248,3 +249,8 @@ export default class Hostel extends Component {
 		);
 	}
 }
+
+const mapStateToProps = (state) => ({
+	auth: state.auth
+});
+export default connect(mapStateToProps)(Hostel);

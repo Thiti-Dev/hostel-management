@@ -27,9 +27,12 @@ exports.commentHostel = asyncHandler(async (req, res, next) => {
 	//
 	// ─── CREATE THEN POPULATE ( for shifting element into the existing array [frontend-sided] with the exact current username & photo) ────────────────────────────────────────────────────────
 	// @ TODO => better way is to sign the username and photo in to the JWT token and the decode it somewhere to use > later than populating every single time that comment is created
-	let comment = await Comment.create(fieldToCreate);
-	comment = await comment.populate('user', 'photo username').execPopulate();
+	// @ DONE TODO
+	//let comment = await Comment.create(fieldToCreate);
+	//comment = await comment.populate('user', 'photo username').execPopulate();
 	// ────────────────────────────────────────────────────────────────────────────────
+
+	const comment = await Comment.create(fieldToCreate); // no need to populate anymore => frontend-sided can load the photo_username by decoing the jwt token
 
 	res.status(200).json({
 		sucess: true,

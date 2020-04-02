@@ -105,9 +105,7 @@ export default class Comment extends Component {
 
 				this.setState({ comment_text: '' }); // empty the comment text
 				next();
-
-				const current_user_data = comment.data.data.user;
-				on_success(comment_text, current_user_data); // calling a callback to shift the message to an array
+				on_success(comment_text); // calling a callback to shift the message to an array
 			} catch (error) {}
 		} else {
 			next(false, 'No message provided');
