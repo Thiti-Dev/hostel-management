@@ -18,14 +18,11 @@ import {
 	InputGroup,
 	Navbar
 } from 'react-bootstrap';
-import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
 //
 // ─── STYLING ────────────────────────────────────────────────────────────────────
 //
-import { Animated } from 'react-animated-css';
 import styled from 'styled-components';
-import { fade_move_down } from '../../styles/Keyframe';
 // ────────────────────────────────────────────────────────────────────────────────
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -50,13 +47,10 @@ const text_truncate = function(str, length, ending) {
 	}
 };
 
-export default function CreatePanel({ history }) {
-	const _authState = useSelector((state) => state.auth);
-	const [ previewImg, setPreviewImg ] = useState(
-		'https://q-cf.bstatic.com/images/hotel/max1024x768/204/204628111.jpg'
-	);
+export default function EditPanel({ history, hostel_details, on_hide }) {
+	const [ previewImg, setPreviewImg ] = useState(undefined);
 	const [ hostelDetails, setHostelDetails ] = useState({
-		photo: undefined,
+		photo_on_stage: undefined,
 		name: '',
 		description: '',
 		address: '',
@@ -65,13 +59,19 @@ export default function CreatePanel({ history }) {
 		phone: '',
 		email: ''
 	});
+
+	useEffect(() => {
+		setHostelDetails(hostel_details);
+		console.log('here');
+	}, []);
+
 	const onImageChange = (event) => {
 		if (event.target.files && event.target.files[0]) {
 			setPreviewImg(URL.createObjectURL(event.target.files[0]));
 			let photo_file = event.target.files[0];
 			console.log(photo_file);
 			setHostelDetails((prevState) => {
-				return { ...prevState, photo: photo_file };
+				return { ...prevState, photo_on_stage: photo_file };
 			});
 		}
 	};
@@ -79,7 +79,7 @@ export default function CreatePanel({ history }) {
 	const checkIfRequiredDataAreAllFilled = () => {
 		const requiredField = [ 'name', 'price', 'description', 'capacity', 'address' ];
 
-		if (hostelDetails.photo === undefined) return false; // if the photo is not selected return immediately
+		//if (hostelDetails.photo === undefined) return false; // if the photo is not selected return immediately
 
 		let shallProceed = true; // by default
 		for (let x of requiredField) {
@@ -93,6 +93,66 @@ export default function CreatePanel({ history }) {
 
 	const onPublishClicked = async (next) => {
 		if (checkIfRequiredDataAreAllFilled()) {
+			next();
+			// Generate hostelDetail into formdata [ Will be using array map later => for now use this instead ]
+			let formData = new FormData();
+			if (hostelDetails.photo_on_stage) {
+				formData.append('file', hostelDetails.photo_on_stage);
+			}
+			const allField = [ 'name', 'description', 'capacity', 'address', 'price', 'phone', 'email' ];
+			for (let x of allField) {
+				if (hostelDetails[x].length > 0) {
+					if (x === 'price') {
+						formData.append(x, parseInt(hostelDetails[x]));
+					} else formData.append(x, hostelDetails[x]);
+				}
+			}
+			// ─────────────────────────────────────────────────────────────────
+
+			try {
+				const edit_request = await axios.put(`/api/hostels/${hostel_details._id}/updatedetails`, formData);
+				console.log(edit_request);
+				MySwal.fire({
+					position: 'center',
+					icon: 'success',
+					title: 'Successfully edited the hostel',
+					showConfirmButton: false,
+					timer: 2000
+				});
+				setTimeout(() => {
+					window.location.reload(false);
+				}, 2000);
+			} catch (error) {
+				console.log(error.response.data);
+				let error_msg = error.response.data.errors || 'Server Error';
+				if (error_msg.includes('Duplicate')) {
+					error_msg = 'This Hostel name is already exist';
+				} else if (error_msg.includes('size')) {
+					error_msg = 'The image is too large';
+				}
+				MySwal.fire({
+					position: 'center',
+					icon: 'error',
+					title: 'Error Occured',
+					text: error_msg,
+					showConfirmButton: false,
+					timer: 2000
+				});
+				next(false, 'Invalid Credential');
+			}
+		} else {
+			MySwal.fire({
+				position: 'center',
+				icon: 'error',
+				title: 'Please fill all required field',
+				text: 'The information are needed for publishing hostel',
+				showConfirmButton: false,
+				timer: 2000
+			});
+			next(false, 'Invalid Credential');
+		}
+
+		/*if (checkIfRequiredDataAreAllFilled()) {
 			next();
 			console.log(hostelDetails);
 
@@ -146,7 +206,7 @@ export default function CreatePanel({ history }) {
 				timer: 2000
 			});
 			next(false, 'Invalid Credential');
-		}
+		}*/
 	};
 
 	const formInputHandler = (event) => {
@@ -161,7 +221,12 @@ export default function CreatePanel({ history }) {
 		<FormHolder>
 			<Row style={{ marginBottom: '2rem' }}>
 				<Col md={3}>
-					<Image style={{ textAlign: 'center' }} src={previewImg} width="150" height="110" />
+					<Image
+						style={{ textAlign: 'center' }}
+						src={previewImg || `/uploads/${hostelDetails.photo}`}
+						width="150"
+						height="110"
+					/>
 				</Col>
 				<Col md={9}>
 					<Form.Group as={Row} controlId="formHorizontalHostelName">
@@ -182,17 +247,17 @@ export default function CreatePanel({ history }) {
 					</Form.Group>
 					<Form.Group as={Row} controlId="formHorizontalHostelPrice">
 						<Form.Label column md={4}>
-							<RequiredText>* </RequiredText>Hostel Photo
+							Hostel Photo
 						</Form.Label>
 						<Col md={8}>
 							<Form.File
 								onChange={onImageChange}
 								id="custom-file"
 								label={
-									!hostelDetails.photo ? (
+									!hostelDetails.photo_on_stage ? (
 										'Select hostel photo'
 									) : (
-										text_truncate(hostelDetails.photo.name, 20)
+										text_truncate(hostelDetails.photo_on_stage.name, 20)
 									)
 								}
 								custom
@@ -317,19 +382,17 @@ export default function CreatePanel({ history }) {
 					loadingLabel="Creating create panel , Please be patient . . ."
 					resultLabel="👍🏽"
 				>
-					Publish hostel
+					Update Information
 				</AwesomeButtonProgress>
 				<AwesomeButton
 					style={{ width: '100%', marginTop: '0.5rem' }}
 					type="reddit"
 					size="medium"
-					action={() => {
-						history.push('/home');
-					}}
-					loadingLabel="Applying your changes , Please be patient . . ."
+					action={() => on_hide()}
+					loadingLabel="Creating create panel , Please be patient . . ."
 					resultLabel="👍🏽"
 				>
-					Take me back to home
+					Cancel
 				</AwesomeButton>
 			</Form>
 		</FormHolder>

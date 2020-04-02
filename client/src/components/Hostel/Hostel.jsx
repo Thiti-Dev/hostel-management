@@ -18,7 +18,8 @@ import {
 	Form,
 	InputGroup,
 	Navbar,
-	Nav
+	Nav,
+	Modal
 } from 'react-bootstrap';
 import DatePicker from 'react-date-picker';
 import { AwesomeButton, AwesomeButtonProgress, AwesomeButtonSocial } from 'react-awesome-button';
@@ -43,7 +44,8 @@ import { GoLocation } from 'react-icons/go';
 import { AiOutlineMail } from 'react-icons/ai';
 import queryString from 'query-string';
 import Comment from './Comment';
-
+import * as Func from '../../utils/Functions';
+import EditPanel from './EditPanel';
 const MySwal = withReactContent(Swal);
 
 const OutestContainer = styled(Container)`
@@ -75,6 +77,7 @@ const CustomNameLabel = styled.p`
 	font-weight: bolder;
 	/* white-space: nowrap; */
 	margin-top: 2rem;
+	overflow-wrap: break-word;
 `;
 
 const CustomUserNameLabel = styled.p`
@@ -90,7 +93,8 @@ class Hostel extends Component {
 			currentAction: 'details',
 			hostelDetail: null,
 			totalBooked: 0,
-			hostelComments: null
+			hostelComments: null,
+			isEditing: false
 		};
 	}
 	onChangeAction(action) {
@@ -133,12 +137,22 @@ class Hostel extends Component {
 		});
 	}
 
+	onEditHostel(next) {
+		this.setState({ isEditing: true });
+		next();
+	}
+
+	onHideEditing() {
+		this.setState({ isEditing: false });
+	}
+
 	componentDidMount() {
 		console.log(this.props.match.params.hostelSlug);
 		this.fetchHostelData(this.props.match.params.hostelSlug);
 	}
 	render() {
-		const { currentAction, hostelDetail, totalBooked, hostelComments } = this.state;
+		const { currentAction, hostelDetail, totalBooked, hostelComments, isEditing } = this.state;
+		const { user } = this.props.auth;
 		let rendered_content;
 		if (currentAction === 'details') {
 			if (!hostelDetail) {
@@ -188,7 +202,7 @@ class Hostel extends Component {
 					</Row>
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
-							<CustomNameLabel>{hostelDetail.name}</CustomNameLabel>
+							<CustomNameLabel>{Func.text_truncate(hostelDetail.name, 50)}</CustomNameLabel>
 						</Col>
 					</Row>
 					<Row style={{ textAlign: 'left', marginTop: '1rem' }}>
@@ -222,11 +236,38 @@ class Hostel extends Component {
 							</ul>
 						</Col>
 					</Row>
+					{hostelDetail.owner._id === user.id ? (
+						<React.Fragment>
+							<AwesomeButtonProgress
+								style={{ width: '100%', marginTop: '0.6rem' }}
+								type="secondary"
+								size="medium"
+								action={(element, next) =>
+									setTimeout(() => {
+										//awesome_button_middleware = next;
+										this.onEditHostel(next);
+									}, 500)}
+								loadingLabel="Editing . . ."
+								resultLabel="👍🏽"
+							>
+								Edit
+							</AwesomeButtonProgress>
+						</React.Fragment>
+					) : null}
 				</React.Fragment>
 			);
 		}
 		return (
 			<React.Fragment>
+				<Modal
+					show={isEditing}
+					size="lg"
+					aria-labelledby="contained-modal-title-vcenter"
+					centered
+					backdrop="static"
+				>
+					<EditPanel hostel_details={hostelDetail} on_hide={this.onHideEditing.bind(this)} />
+				</Modal>
 				<OutestContainer fluid>
 					<UserNavColumn2>{rendered_hostel_detail}</UserNavColumn2>
 					<ContentContainer fluid>
