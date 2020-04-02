@@ -29,6 +29,13 @@ exports.bookHostel = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Hostel with id ${hostelId} is not exist`, 404));
 	}
 
+	if (req.body.checkIn >= req.body.checkOut) {
+		return next(new ErrorResponse(`Check-In Should be before Check-Out date`, 404));
+	}
+	if (req.body.checkOut <= req.body.checkIn) {
+		return next(new ErrorResponse(`Check-Out should be after Check-In date`, 404));
+	}
+
 	// @TODO => Check again here if can proceed => ( prevent use from using any api requester to directly book the hostel) [ DONE ] [ CODE BELOW ]
 	// @DONE PREVENTION
 	let isAlreadyBook = await Booking.findOne({
