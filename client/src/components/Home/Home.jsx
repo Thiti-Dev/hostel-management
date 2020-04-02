@@ -125,11 +125,15 @@ class Home extends React.Component {
 				totalGuest: this.state.totalGuest
 			});
 			if (fetched_hostel.data.data.length <= 0) {
+				let dynamic_msg =
+					searchStr.length > 0
+						? `No hostel matched with ${searchStr}`
+						: 'There is no published hostel \n at the moment . . . ';
 				// not fonud any
 				MySwal.fire({
 					position: 'center',
 					icon: 'error',
-					title: `No hostel matched with ${searchStr}`,
+					title: dynamic_msg,
 					showConfirmButton: false,
 					timer: 1500,
 					timerProgressBar: true,
