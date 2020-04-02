@@ -44,7 +44,10 @@ exports.getHostelComments = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`The hostel with id ${hostelId} is not exist`, 404));
 	}
 
-	const comment = await Comment.find({ hostel: hostelId });
+	const comment = await Comment.find({ hostel: hostelId }).populate({
+		path: 'user',
+		select: 'username firstName lastName photo'
+	});
 
 	res.status(200).json({
 		sucess: true,
