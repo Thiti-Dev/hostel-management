@@ -34,7 +34,7 @@ import styled from 'styled-components';
 import * as Func from '../../utils/Functions';
 
 import DecodedJWT from '../../utils/DecodedJWT';
-
+import setAuthToken from './../../utils/setAuthToken';
 const MainBg =
 	'https://images.unsplash.com/photo-1483943341979-30154bdbb4d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80';
 
@@ -124,6 +124,8 @@ function Login(props) {
 			const result = await axios.post('/api/auth/login', credentials);
 			const { token } = result.data;
 			const decoded = DecodedJWT(token);
+			localStorage.setItem('jwtToken', token);
+			setAuthToken(token);
 			setNeedSmooth(true); // set need smooth before dispatching an action
 			dispatch(allActions.authActions.setCurrentUser(decoded));
 			console.log(decoded);
@@ -180,7 +182,7 @@ function Login(props) {
 								setTimeout(() => {
 									//awesome_button_middleware = next;
 									formSubmit(next);
-								}, 500)}
+								}, 50)}
 							loadingLabel="Logging In , Please be patient . . ."
 							resultLabel="👍🏽"
 						>

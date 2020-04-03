@@ -43,7 +43,7 @@ const MySwal = withReactContent(Swal);
 //
 // ─── SETTING ────────────────────────────────────────────────────────────────────
 //
-const FAKE_LOAD_TIMER = 1800; // 1.8s
+const FAKE_LOAD_TIMER = 1; // 1.8s
 // ────────────────────────────────────────────────────────────────────────────────
 
 function BookModal(props) {
@@ -197,7 +197,11 @@ function BookModal(props) {
 					<Container>
 						<Row className="show-grid">
 							<Col md={4}>
-								<img src={`/uploads/${photo}`} width="100%" height="220" />
+								<img
+									src={`https://storage.googleapis.com/hosteloga-uploads/${photo}`}
+									width="100%"
+									height="220"
+								/>
 
 								<p style={{ textAlign: 'center' }}>
 									<br />

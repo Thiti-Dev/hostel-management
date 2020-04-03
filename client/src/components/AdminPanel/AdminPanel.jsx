@@ -236,7 +236,9 @@ class AdminPanel extends Component {
 					return (
 						<React.Fragment key={key}>
 							<HostelHolder onClick={() => this.onActionPanelShown(hostel._id)}>
-								<CustomPhotoInside photo_url={`/uploads/${hostel.photo}`} />
+								<CustomPhotoInside
+									photo_url={`https://storage.googleapis.com/hosteloga-uploads/${hostel.photo}`}
+								/>
 								<CustomInformationBox>
 									<GoLocation /> {hostel.name}{' '}
 									{hostel.validated ? (
@@ -265,7 +267,9 @@ class AdminPanel extends Component {
 					return (
 						<React.Fragment key={key}>
 							<HostelHolder onClick={() => this.onActionPanelShown(hostel._id)}>
-								<CustomPhotoInside photo_url={`/uploads/${hostel.photo}`} />
+								<CustomPhotoInside
+									photo_url={`https://storage.googleapis.com/hosteloga-uploads/${hostel.photo}`}
+								/>
 								<CustomInformationBox>
 									<GoLocation /> {hostel.name}{' '}
 									{hostel.validated ? (

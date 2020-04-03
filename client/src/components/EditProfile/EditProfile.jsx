@@ -382,7 +382,7 @@ export default class EditProfile extends Component {
 			let formData = new FormData();
 			formData.append('file', file);
 			try {
-				const upload_request = await axios.put('/api/auth/uploadPhoto', formData);
+				const upload_request = await axios.put('/api/auth/uploadPhotov2', formData);
 				const stored_name = upload_request.data.data;
 				this.setState((prevState) => ({
 					cachedCredential: {
@@ -432,13 +432,13 @@ export default class EditProfile extends Component {
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
 							<CustomUserImage
-								src={`/uploads/${cachedCredential.photo}`}
+								src={`https://storage.googleapis.com/hosteloga-uploads/${cachedCredential.photo}`}
 								width="150"
 								height="150"
 								roundedCircle
 								onClick={() => this.onChangeImage()}
 							/>
-							<UserNameText>aaw0kenn</UserNameText>
+							<UserNameText>{credentials.username}</UserNameText>
 						</Col>
 					</Row>
 					<Row>

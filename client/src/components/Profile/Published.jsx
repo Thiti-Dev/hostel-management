@@ -112,7 +112,7 @@ export default class Published extends Component {
 							<Card.Img
 								style={{ width: '100%', height: '220px' }}
 								variant="top"
-								src={`/uploads/${hostel.photo}`}
+								src={`https://storage.googleapis.com/hosteloga-uploads/${hostel.photo}`}
 							/>
 							<Card.Body>
 								<Link to={`/hostel/${hostel.slug}`}>

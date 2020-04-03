@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import allActions from '../../redux/actions';
+import { useSelector, useDispatch } from 'react-redux';
 import {
 	Button,
 	//Jumbotron,
@@ -45,12 +47,16 @@ import withReactContent from 'sweetalert2-react-content';
 //
 import OnScreenSensor from 'react-onscreensensor';
 import * as Func from '../../utils/Functions';
+import setAuthToken from './../../utils/setAuthToken';
 // ────────────────────────────────────────────────────────────────────────────────
 
 //
 // ─── VALIDATOR ──────────────────────────────────────────────────────────────────
 //
 import _isRegistrationValid from './validation/register';
+
+import DecodedJWT from '../../utils/DecodedJWT';
+
 const MySwal = withReactContent(Swal);
 const MainContainer = styled(Container)`
 	padding: 5vw;
@@ -111,6 +117,8 @@ function Register({ history }) {
 	const [ termAccept, setTermAccept ] = useState(false);
 	const [ _regisDone, setDoneRegis ] = useState(false);
 
+	const dispatch = useDispatch();
+
 	const handleSubmit = async (next) => {
 		if (!_isRegistrationValid(credentials) || !termAccept) {
 			return next(false, '💢 Could not proceed . . . ');
@@ -120,7 +128,10 @@ function Register({ history }) {
 			console.log(res);
 			next(); // Thumbing up
 			setDoneRegis(true); // Successfully regis , hide the form and then show the alert text with the smooth transistion
-
+			localStorage.setItem('jwtToken', res.data.token);
+			const decoded = DecodedJWT(res.data.token);
+			dispatch(allActions.authActions.setCurrentUser(decoded));
+			setAuthToken(res.data.token);
 			MySwal.fire({
 				position: 'center',
 				icon: 'success',
@@ -421,7 +432,7 @@ function Register({ history }) {
 								setTimeout(() => {
 									//awesome_button_middleware = next;
 									handleSubmit(next);
-								}, 500)}
+								}, 50)}
 							loadingLabel="Creating Account , Please be patient . . ."
 							resultLabel="👍🏽"
 						>

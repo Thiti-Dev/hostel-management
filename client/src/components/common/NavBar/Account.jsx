@@ -4,6 +4,7 @@ import user from './assets/user.png';
 import edit_account from './assets/edit-account.png';
 import logout from './assets/logout.png';
 import { Link } from 'react-router-dom';
+import allActions from '../../../redux/actions';
 import { useSelector, useDispatch } from 'react-redux';
 import cookie from 'react-cookies';
 const List = styled.ul`
@@ -39,11 +40,14 @@ const StyledLink = styled.a`
 
 export default ({ gotoroute }) => {
 	const _authState = useSelector((state) => state.auth);
-
+	const dispatch = useDispatch();
 	const onLogOut = () => {
 		//  remove the user token and then refresh the page
 		cookie.remove('token', { path: '/' });
-		window.location.reload(false); // reloading after the cookie is removed => automatically un-authenticated and will be redirecting to the login page
+		window.localStorage.removeItem('jwtToken');
+		dispatch(allActions.authActions.setCurrentUser({}));
+		//window.location.reload(false); // reloading after the cookie is removed => automatically un-authenticated and will be redirecting to the login page
+		gotoroute('/login');
 	};
 
 	return (

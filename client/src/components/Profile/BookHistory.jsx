@@ -177,7 +177,9 @@ export default class BookHistory extends Component {
 				return (
 					<React.Fragment key={key}>
 						<BookedHolder>
-							<CustomPhotoInside photo_url={`/uploads/${booking.hostel.photo}`} />
+							<CustomPhotoInside
+								photo_url={`https://storage.googleapis.com/hosteloga-uploads/${booking.hostel.photo}`}
+							/>
 							<CustomInformationBox>
 								<GoLocation /> {booking.hostel.name}
 								<ul>

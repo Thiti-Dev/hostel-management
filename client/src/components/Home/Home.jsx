@@ -177,15 +177,12 @@ class Home extends React.Component {
 
 				<Fab icon={<FiNavigation2 />} mainButtonStyles={{ backgroundColor: '#ff0000' }}>
 					<Action
-						style={{
-							backgroundColor: '#89db42',
-							backgroundImage: `url('/uploads/${this.props.auth.user.photo}')`,
-							backgroundPosition: 'center',
-							backgroundSize: 'contain'
-						}}
 						text="My profile"
 						onClick={() => this.goToMyProfile()}
-					/>
+						style={{ backgroundColor: '#ed0c5e' }}
+					>
+						<MdPersonOutline />
+					</Action>
 				</Fab>
 
 				<Container fluid style={{ margin: 0, padding: 0 }}>

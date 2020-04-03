@@ -107,7 +107,7 @@ export default function CreatePanel({ history }) {
 			formData.append('email', hostelDetails.email);
 			// ─────────────────────────────────────────────────────────────────
 			try {
-				const published_request = await axios.post('/api/hostels/', formData);
+				const published_request = await axios.post('/api/hostels/v2', formData);
 				console.log(published_request);
 				MySwal.fire({
 					position: 'center',

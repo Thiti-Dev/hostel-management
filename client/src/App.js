@@ -1,4 +1,5 @@
 import React from 'react';
+
 import cookie from 'react-cookies';
 import logo from './logo.svg';
 import './App.css';
@@ -32,10 +33,14 @@ import Hostel from './components/Hostel';
 import AdminPanel from './components/AdminPanel';
 import PageNotFound from './components/PageNotFound';
 import UnAuthorized from './components/UnAuthorized';
+import setAuthToken from './utils/setAuthToken';
+let axiosDefaults = require('axios/lib/defaults');
+axiosDefaults.baseURL = 'https://hosteloga-api.herokuapp.com';
 
 const isStillAuthenticated = (token) => {
 	//Check for token
 	if (token) {
+		setAuthToken(token);
 		//Decode token and get user info and exp
 		const decoded = DecodedJWT(token);
 		// Set user and isAuthenticated
@@ -53,13 +58,10 @@ const isStillAuthenticated = (token) => {
 	}
 };
 
+isStillAuthenticated(localStorage.jwtToken);
+
 class App extends React.Component {
-	componentWillMount() {
-		// Big bug fixed ( changed from did mount to will mount => need to be checking before the route is created)
-		// later will decide if this has to do everytimes that the component is rendered or just once in this cycle
-		const token = cookie.load('token');
-		isStillAuthenticated(token);
-	}
+	componentWillMount() {}
 	render() {
 		//const state = store.getState();
 		return (
@@ -69,6 +71,7 @@ class App extends React.Component {
 						<Route exact path="/" component={Landing} />
 						<Route exact path="/login" component={Login} />
 						<Route exact path="/401" component={UnAuthorized} />
+						<Route exact path="/404" component={PageNotFound} />
 						<PrivateRoute exact path="/home" component={Home} />
 						<PrivateRoute exact path="/profile/edit" component={EditProfile} />
 						<PrivateRoute exact path="/create/hostel" component={CreateHostel} />

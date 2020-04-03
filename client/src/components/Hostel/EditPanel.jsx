@@ -110,7 +110,7 @@ export default function EditPanel({ history, hostel_details, on_hide }) {
 			// ─────────────────────────────────────────────────────────────────
 
 			try {
-				const edit_request = await axios.put(`/api/hostels/${hostel_details._id}/updatedetails`, formData);
+				const edit_request = await axios.put(`/api/hostels/${hostel_details._id}/updatedetailsv2`, formData);
 				console.log(edit_request);
 				MySwal.fire({
 					position: 'center',
@@ -223,7 +223,7 @@ export default function EditPanel({ history, hostel_details, on_hide }) {
 				<Col md={3}>
 					<Image
 						style={{ textAlign: 'center' }}
-						src={previewImg || `/uploads/${hostelDetails.photo}`}
+						src={previewImg || `https://storage.googleapis.com/hosteloga-uploads/${hostelDetails.photo}`}
 						width="150"
 						height="110"
 					/>

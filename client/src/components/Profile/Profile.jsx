@@ -190,7 +190,12 @@ export default class Profile extends Component {
 				<React.Fragment>
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
-							<Image src={`/uploads/${profileData.photo}`} rounded width="280" height="220" />
+							<Image
+								src={`https://storage.googleapis.com/hosteloga-uploads/${profileData.photo}`}
+								rounded
+								width="280"
+								height="220"
+							/>
 						</Col>
 					</Row>
 					<Row style={{ textAlign: 'center' }}>

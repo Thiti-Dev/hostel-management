@@ -199,7 +199,7 @@ export default function PlaceLists({ placeData, totalGuest, history }) {
 			<React.Fragment key={key}>
 				<PlaceOuterContainer>
 					<PlaceContainer>
-						<PlacePhoto photo_loc={`/uploads/${place.photo}`} />
+						<PlacePhoto photo_loc={`https://storage.googleapis.com/hosteloga-uploads/${place.photo}`} />
 						<PlaceInfo>
 							<PlaceName>{place.name}</PlaceName>
 							<StatusHolder>

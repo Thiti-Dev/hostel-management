@@ -131,11 +131,11 @@ class Hostel extends Component {
 		}
 	}
 
-	onCommentSuccess(msg) {
+	onCommentSuccess(msg, currentUserDetails) {
 		const appended_msg = {
 			user: {
-				username: this.props.auth.user.username,
-				photo: this.props.auth.user.photo
+				username: currentUserDetails.username,
+				photo: currentUserDetails.photo
 			},
 			message: msg,
 			createdAt: new Date(Date.now())
@@ -213,7 +213,12 @@ class Hostel extends Component {
 				<React.Fragment>
 					<Row style={{ textAlign: 'center' }}>
 						<Col md={12}>
-							<Image src={`/uploads/${hostelDetail.photo}`} rounded width="280" height="220" />
+							<Image
+								src={`https://storage.googleapis.com/hosteloga-uploads/${hostelDetail.photo}`}
+								rounded
+								width="280"
+								height="220"
+							/>
 						</Col>
 					</Row>
 					<Row style={{ textAlign: 'center' }}>

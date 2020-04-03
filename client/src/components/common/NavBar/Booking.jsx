@@ -118,7 +118,12 @@ class Booking extends Component {
 				return (
 					<CustomRow className="hvr-grow">
 						<Col md={4}>
-							<Image src={`/uploads/${place.hostel.photo}`} width="120" height="80" rounded />
+							<Image
+								src={`https://storage.googleapis.com/hosteloga-uploads/${place.hostel.photo}`}
+								width="120"
+								height="80"
+								rounded
+							/>
 						</Col>
 						<Col md={8}>
 							<p>

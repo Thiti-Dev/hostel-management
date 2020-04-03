@@ -106,7 +106,7 @@ export default class Comment extends Component {
 
 				this.setState({ comment_text: '' }); // empty the comment text
 				next();
-				on_success(comment_text); // calling a callback to shift the message to an array
+				on_success(comment_text, comment.data.data.user); // calling a callback to shift the message to an array
 			} catch (error) {}
 		} else {
 			next(false, 'No message provided');
@@ -126,7 +126,12 @@ export default class Comment extends Component {
 					<React.Fragment key={key}>
 						<CommentRow>
 							<Col md={1}>
-								<Image src={`/uploads/${comment.user.photo}`} height="80" width="80" align="middle" />
+								<Image
+									src={`https://storage.googleapis.com/hosteloga-uploads/${comment.user.photo}`}
+									height="80"
+									width="80"
+									align="middle"
+								/>
 							</Col>
 							<Col md={{ span: 10, offset: 1 }} style={{ marginLeft: '1rem' }}>
 								<CustomUserNameText>
