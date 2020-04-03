@@ -11,6 +11,9 @@ const cookieParser = require('cookie-parser');
 // Load env vars
 dotenv.config({ path: './config/config.env' });
 
+// Cross-origin
+var cors = require('cors');
+
 // routes importing
 const auth = require('./routes/api/auth');
 const services = require('./routes/api/services');
@@ -24,6 +27,17 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
 const mainThread = async () => {
+	//
+	// ─── CORS ───────────────────────────────────────────────────────────────────────
+	//
+	app.use(
+		cors({
+			preflightContinue: true,
+			credentials: true
+		})
+	);
+	// ────────────────────────────────────────────────────────────────────────────────
+
 	// Set static folder
 	app.use(express.static(path.join(__dirname, 'public')));
 	// ────────────────────────────────────────────────────────────────────────────────

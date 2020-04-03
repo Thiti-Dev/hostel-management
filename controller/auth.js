@@ -5,6 +5,8 @@ const path = require('path');
 // Model importing
 const User = require('../models/User');
 
+const uploadImage = require('../utils/cloudUpload');
+
 // @desc    Check if the route properly returns the normal response ( JSON )
 // @route   GET /api/auth/check
 // @acess   Public
@@ -179,4 +181,42 @@ exports.uploadUserPhoto = asyncHandler(async (req, res, next) => {
 
 		res.status(200).json({ success: true, data: file.name });
 	});
+});
+
+// @desc    Update user photo ( using cloud )
+// @route   PUT /api/auth/uploadphotov2
+// @acess   Private
+exports.uploadUserPhotoV2 = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id); // findByIdAndDelete not gonna triggered the middle ware
+	if (!user) {
+		//return res.status(400).json({ success: false });
+		return next(new ErrorResponse(`User not found with id of ${req.user.id}`, 404));
+	}
+
+	if (!req.files) {
+		return next(new ErrorResponse(`Please upload a file`, 400));
+	}
+
+	const file = req.files.file;
+
+	// Make sure the image is a photo
+	if (!file.mimetype.startsWith('image')) {
+		return next(new ErrorResponse(`Please upload an image file`, 400));
+	}
+
+	// Check filesize
+	if (file.size > process.env.MAX_FILE_UPLOAD) {
+		return next(new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400));
+	}
+
+	// Create custom filename
+	file.name = `photo_${user._id}${path.parse(file.name).ext}`;
+
+	const upload_response = await uploadImage(file);
+
+	await User.findByIdAndUpdate(req.user.id, {
+		photo: file.name
+	});
+
+	res.status(200).json({ success: true, data: file.name });
 });

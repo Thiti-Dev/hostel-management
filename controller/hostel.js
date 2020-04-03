@@ -5,6 +5,8 @@ const Hostel = require('../models/Hostel');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 
+const uploadImage = require('../utils/cloudUpload');
+
 var ObjectId = require('mongodb').ObjectID;
 // @desc    Get all hostel
 // @route   GET /api/hostels/
@@ -154,6 +156,64 @@ exports.createHostel = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// @desc    Create sigle hostel ( using cloud upload )
+// @route   POST /api/hostels/v2
+// @acess   Private
+exports.createHostelV2 = asyncHandler(async (req, res, next) => {
+	//
+	// ─── CODE BELOW WILL USING UUID AND GENERATE V4 BY SHORTEN THEM BEFORE THE USE (LATER)──
+	//
+
+	// Add user to req.body before crating with the raw body
+	req.body.owner = req.user.id;
+	req.body.price = parseInt(req.body.price);
+	req.body.capacity = parseInt(req.body.capacity);
+	//
+	// ─── CHECK FOR FILE UPLOAD FIRST ─────────────────────────────────────────────────────────
+	//
+
+	if (!req.files) {
+		return next(new ErrorResponse(`Please upload a file`, 400));
+	}
+
+	const file = req.files.file;
+
+	// Make sure the image is a photo
+	if (!file.mimetype.startsWith('image')) {
+		return next(new ErrorResponse(`Please upload an image file`, 400));
+	}
+
+	// Check filesize
+	if (file.size > process.env.MAX_FILE_UPLOAD) {
+		return next(new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400));
+	}
+
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	// Create here because => the _id is needed for creating a unique file name
+	const created_hostel = await Hostel.create(req.body);
+
+	// Create custom filename
+	file.name = `photo_${created_hostel._id}${path.parse(file.name).ext}`;
+	req.body.photo = file.name;
+	uploadImage(file)
+		.then(async (_res) => {
+			// Re-assgin the name to photo
+			created_hostel.photo = file.name;
+			await created_hostel.save();
+
+			res.status(201).json({
+				success: true,
+				data: created_hostel
+			});
+		})
+		.catch(async (err) => {
+			await created_hostel.remove(); // not a good practice ( but I've got time limitation )
+			console.log(err);
+			return next(new ErrorResponse(`Problem with file upload`, 500));
+		});
+});
+
 // @desc    Update hostel details / picture if included
 // @route   PUT /api/hostels/:hostelId/updatedetails
 // @acess   Private
@@ -207,6 +267,74 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
 				// This shouldn't happen
 				return next(new ErrorResponse(`Problem with file upload`, 500));
 			}
+		});
+	}
+
+	console.log(req.body);
+
+	const hostel = await Hostel.findByIdAndUpdate(hostelId, req.body, {
+		new: true, // returning the document after update applied
+		runValidators: true // run validator
+	});
+
+	res.status(200).json({
+		success: true,
+		data: hostel
+	});
+});
+
+// @desc    Update hostel details / picture if included ( v2 using cloud )
+// @route   PUT /api/hostels/:hostelId/updatedetailsv2
+// @acess   Private
+exports.updateDetailsV2 = asyncHandler(async (req, res, next) => {
+	const { hostelId } = req.params;
+	// specific the field => protected from eding
+	// If more field to prevent => later will be store the blacklist in the array and then map
+	if (req.body._id) delete req.body['_id'];
+	if (req.body.createdAt) delete req.body['createdAt'];
+	if (req.body.validated) delete req.body['validated'];
+	if (req.body.validatedAt) delete req.body['validatedAt'];
+	if (req.body.owner) delete req.body['owner'];
+	if (req.body.photo) delete req.body['photo'];
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	const hostel_exist_data = await Hostel.findById(hostelId);
+
+	if (!hostel_exist_data) {
+		return next(new ErrorResponse(`Hostel with id ${hostelId} is not exist`, 404));
+	}
+
+	//@TODO check if user is the owner [EASY , later]
+	//DONE [ CODE BELOW ]
+
+	if (hostel_exist_data.owner.toString() !== req.user.id) {
+		return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this hostel`, 401));
+	}
+
+	// ────────────────────────────────────────────────────────────────────────────────
+
+	if (req.files) {
+		const file = req.files.file;
+		//if photo is attached
+		// Make sure the image is a photo
+		if (!file.mimetype.startsWith('image')) {
+			return next(new ErrorResponse(`Please upload an image file`, 400));
+		}
+
+		// Check filesize
+		if (file.size > process.env.MAX_FILE_UPLOAD) {
+			return next(
+				new ErrorResponse(`Image size should less than ${process.env.MAX_FILE_UPLOAD / 1000000} mb`, 400)
+			);
+		}
+
+		// Create custom filename
+		file.name = `photo_${hostel_exist_data._id}${path.parse(file.name).ext}`;
+		req.body.photo = file.name;
+		uploadImage(file).catch(async (err) => {
+			await created_hostel.remove(); // not a good practice ( but I've got time limitation )
+			console.log(err);
+			return next(new ErrorResponse(`Problem with file upload`, 500));
 		});
 	}
 

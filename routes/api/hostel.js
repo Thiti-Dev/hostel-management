@@ -9,7 +9,9 @@ const {
 	updateDetails,
 	verifyHostel,
 	unVerifyHostel,
-	deleteHostel
+	deleteHostel,
+	createHostelV2,
+	updateDetailsV2
 } = require('../../controller/hostel');
 const { protect } = require('../../middleware/auth');
 
@@ -21,9 +23,11 @@ router.use('/:hostelId/booking', bookingRouter);
 router.use('/:hostelId/comments', commentsRouter);
 
 router.route('/').get(getAllHostel).post(protect, createHostel);
+router.route('/v2').get(getAllHostel).post(protect, createHostelV2);
 router.route('/:slug').get(getHostelDetailFromSlug);
 router.route('/:hostelId/getCapacity').get(protect, getCapacityBetweenDate);
 router.route('/:hostelId/updatedetails').put(protect, updateDetails);
+router.route('/:hostelId/updatedetailsv2').put(protect, updateDetailsV2);
 router.route('/:hostelId/verify').get(protect, verifyHostel);
 router.route('/:hostelId/unverify').get(protect, unVerifyHostel);
 router.route('/:hostelId').delete(protect, deleteHostel);
